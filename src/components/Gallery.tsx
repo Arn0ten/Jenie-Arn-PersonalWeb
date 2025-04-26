@@ -6,9 +6,10 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import GalleryForm from './GalleryForm';
-import { Trash2, Edit, Plus, Calendar } from 'lucide-react';
+import { Trash2, Edit, Plus, Calendar, Heart, Camera } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ImageGallery from './ImageGallery';
+import { motion } from 'framer-motion';
 
 const Gallery = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
@@ -26,6 +27,8 @@ const Gallery = () => {
     setIsLoading(true);
     try {
       const data = await getGalleryItems();
+      console.log("Gallery items fetched:", data);
+      
       // Sort by date (newest first)
       const sortedItems = [...data].sort((a, b) => 
         new Date(b.monthsary_date).getTime() - new Date(a.monthsary_date).getTime()
@@ -89,17 +92,39 @@ const Gallery = () => {
   if (isLoading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
-        <div className="animate-pulse text-romance-primary">Loading gallery...</div>
+        <div className="flex flex-col items-center">
+          <Camera className="animate-pulse text-romance-primary h-12 w-12 mb-4" />
+          <div className="animate-pulse text-romance-primary text-lg">Loading your memories...</div>
+        </div>
       </div>
     );
   }
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, scale: 0.9 },
+    show: { opacity: 1, scale: 1 }
+  };
+
   const groupedItems = groupItemsByMonthYear();
 
   return (
-    <div className="py-12">
+    <div className="py-12 min-h-[50vh]">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-12">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex justify-between items-center mb-12"
+        >
           <h2 className="text-3xl md:text-4xl text-romance-primary font-bold cursive">Our Photo Gallery</h2>
           
           {isLoggedIn && (
@@ -117,31 +142,60 @@ const Gallery = () => {
               </DialogContent>
             </Dialog>
           )}
-        </div>
+        </motion.div>
 
         {Object.keys(groupedItems).length === 0 ? (
-          <div className="text-center py-16">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-16"
+          >
             <p className="text-lg text-gray-500">No photos added yet.</p>
             {isLoggedIn && (
               <p className="mt-2 text-romance-primary">Click "Add Gallery" to create your first gallery!</p>
             )}
-          </div>
+          </motion.div>
         ) : (
           <div className="space-y-16">
-            {Object.entries(groupedItems).map(([monthYear, items]) => (
-              <div key={monthYear} className="animate-fade-in">
-                <h3 className="text-2xl text-romance-secondary font-bold mb-6 flex items-center">
-                  <Calendar size={20} className="mr-2" />
-                  {monthYear}
-                </h3>
+            {Object.entries(groupedItems).map(([monthYear, items], groupIndex) => (
+              <motion.div 
+                key={monthYear}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: groupIndex * 0.1 }}
+              >
+                <motion.div 
+                  className="flex items-center mb-6"
+                  initial={{ x: -20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ delay: groupIndex * 0.1 + 0.1 }}
+                >
+                  <div className="bg-romance-primary/10 p-2 rounded-full mr-3">
+                    <Calendar size={20} className="text-romance-primary" />
+                  </div>
+                  <h3 className="text-2xl text-romance-secondary font-bold">
+                    {monthYear}
+                  </h3>
+                </motion.div>
                 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                  {items.map((item) => (
-                    <div key={item.id} className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow overflow-hidden">
+                <motion.div 
+                  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+                  variants={container}
+                  initial="hidden"
+                  animate="show"
+                >
+                  {items.map((item, index) => (
+                    <motion.div 
+                      key={item.id} 
+                      className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow overflow-hidden"
+                      variants={item}
+                    >
                       <div className="p-4">
                         <div className="flex justify-between items-start mb-3">
-                          <time className="text-sm text-romance-secondary font-medium">
+                          <time className="text-sm text-romance-secondary font-medium flex items-center">
+                            <Calendar size={14} className="mr-1" />
                             {format(new Date(item.monthsary_date), 'MMMM d, yyyy')}
+                            <span className="ml-2 opacity-60">{index + 1}/{items.length}</span>
                           </time>
                           
                           {isLoggedIn && (
@@ -186,19 +240,26 @@ const Gallery = () => {
                           )}
                         </div>
                         
-                        <h4 className="text-lg font-bold text-romance-primary mb-2">{item.title}</h4>
+                        <motion.h4 
+                          className="text-lg font-bold text-romance-primary mb-2"
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          transition={{ delay: 0.2 }}
+                        >
+                          {item.title}
+                        </motion.h4>
                         <p className="text-gray-700 mb-4 line-clamp-2">{item.description}</p>
                       </div>
                       
                       {item.images && item.images.length > 0 && (
-                        <div className="mt-2">
+                        <div className="mb-3 px-2">
                           <ImageGallery images={item.images} />
                         </div>
                       )}
-                    </div>
+                    </motion.div>
                   ))}
-                </div>
-              </div>
+                </motion.div>
+              </motion.div>
             ))}
           </div>
         )}

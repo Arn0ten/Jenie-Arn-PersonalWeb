@@ -25,11 +25,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (storedLoginStatus === 'true' && storedUserName) {
       setIsLoggedIn(true);
       setUserName(storedUserName);
+      console.log("Logged in from localStorage as:", storedUserName);
     }
   }, []);
 
   const login = async (password: string, name: string): Promise<boolean> => {
     try {
+      console.log("Attempting login with:", { name, password: password.length + " chars" });
       const isValid = await checkAuth(password, name);
       
       if (isValid) {
@@ -41,6 +43,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           title: "Welcome back!",
           description: `Logged in as ${name}`,
         });
+        console.log("Login successful for:", name);
         return true;
       } else {
         toast({
@@ -48,6 +51,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           description: "Invalid password or name",
           variant: "destructive",
         });
+        console.log("Login failed for:", name);
         return false;
       }
     } catch (error) {
@@ -70,6 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       title: "Logged out",
       description: "You have been logged out successfully",
     });
+    console.log("User logged out");
   };
 
   return (

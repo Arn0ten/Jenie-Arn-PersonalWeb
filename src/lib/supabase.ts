@@ -1,11 +1,18 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = 'https://cezsixgyusytlxnyhdvm.supabase.co';
-const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNlenNpeGd5dXN5dGx4bnloZHZtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU0OTIzOTEsImV4cCI6MjA2MTA2ODM5MX0.uG29vpjbsCy9P69GAi-NNLBEZBaztsJMm_Wlq6nRETc';
+const supabaseUrl = 'https://blmuvicbfduadqsrarhn.supabase.co';
+const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJsbXV2aWNiZmR1YWRxc3JhcmhuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDU0OTc1MTEsImV4cCI6MjA2MTA3MzUxMX0.Lwp5KDKNf20lqisu1eYix-dikjvuk5Crz3c8EYaYffA';
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    storage: localStorage
+  }
+});
 
+// Data types
 export type TimelineEntry = {
   id: number;
   date: string;
@@ -41,6 +48,7 @@ export const checkAuth = async (password: string, name: string): Promise<boolean
     .single();
   
   if (error || !data) {
+    console.error('Auth error:', error);
     return false;
   }
   
@@ -54,23 +62,30 @@ export const getTimelineEntries = async (): Promise<TimelineEntry[]> => {
     .select('*')
     .order('date', { ascending: false });
   
-  if (error || !data) {
+  if (error) {
+    console.error('Error fetching timeline entries:', error);
     return [];
   }
   
-  return data;
+  return data || [];
 };
 
 export const createTimelineEntry = async (entry: Omit<TimelineEntry, 'id' | 'created_at'>) => {
-  return await supabase.from('timeline').insert([entry]);
+  const { data, error } = await supabase.from('timeline').insert([entry]);
+  if (error) console.error('Error creating timeline entry:', error);
+  return { data, error };
 };
 
 export const updateTimelineEntry = async (id: number, updates: Partial<TimelineEntry>) => {
-  return await supabase.from('timeline').update(updates).eq('id', id);
+  const { data, error } = await supabase.from('timeline').update(updates).eq('id', id);
+  if (error) console.error('Error updating timeline entry:', error);
+  return { data, error };
 };
 
 export const deleteTimelineEntry = async (id: number) => {
-  return await supabase.from('timeline').delete().eq('id', id);
+  const { error } = await supabase.from('timeline').delete().eq('id', id);
+  if (error) console.error('Error deleting timeline entry:', error);
+  return { error };
 };
 
 // Functions to manage gallery items
@@ -80,34 +95,47 @@ export const getGalleryItems = async (): Promise<GalleryItem[]> => {
     .select('*')
     .order('monthsary_date', { ascending: false });
   
-  if (error || !data) {
+  if (error) {
+    console.error('Error fetching gallery items:', error);
     return [];
   }
   
-  return data;
+  return data || [];
 };
 
 export const createGalleryItem = async (item: Omit<GalleryItem, 'id' | 'created_at'>) => {
-  return await supabase.from('gallery').insert([item]);
+  const { data, error } = await supabase.from('gallery').insert([item]);
+  if (error) console.error('Error creating gallery item:', error);
+  return { data, error };
 };
 
 export const updateGalleryItem = async (id: number, updates: Partial<GalleryItem>) => {
-  return await supabase.from('gallery').update(updates).eq('id', id);
+  const { data, error } = await supabase.from('gallery').update(updates).eq('id', id);
+  if (error) console.error('Error updating gallery item:', error);
+  return { data, error };
 };
 
 export const deleteGalleryItem = async (id: number) => {
-  return await supabase.from('gallery').delete().eq('id', id);
+  const { error } = await supabase.from('gallery').delete().eq('id', id);
+  if (error) console.error('Error deleting gallery item:', error);
+  return { error };
 };
 
 // Function to upload image to Supabase storage
 export const uploadImage = async (file: File, path: string) => {
-  const { data, error } = await supabase.storage
-    .from('couple-images')
-    .upload(`${path}/${file.name}`, file);
-  
-  if (error) {
-    throw error;
+  try {
+    const { data, error } = await supabase.storage
+      .from('couple-images')
+      .upload(`${path}/${file.name}`, file);
+    
+    if (error) {
+      console.error('Image upload error:', error);
+      throw error;
+    }
+    
+    return supabase.storage.from('couple-images').getPublicUrl(`${path}/${file.name}`).data.publicUrl;
+  } catch (err) {
+    console.error('Upload failed:', err);
+    throw err;
   }
-  
-  return supabase.storage.from('couple-images').getPublicUrl(`${path}/${file.name}`).data.publicUrl;
 };

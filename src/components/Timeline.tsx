@@ -6,9 +6,10 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import TimelineForm from './TimelineForm';
-import { Trash2, Edit, Plus, Calendar } from 'lucide-react';
+import { Trash2, Edit, Plus, Calendar, Heart } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import ImageGallery from './ImageGallery';
+import { motion } from 'framer-motion';
 
 const Timeline = () => {
   const [entries, setEntries] = useState<TimelineEntry[]>([]);
@@ -26,6 +27,8 @@ const Timeline = () => {
     setIsLoading(true);
     try {
       const data = await getTimelineEntries();
+      console.log("Timeline entries fetched:", data);
+      
       // Sort entries by date (newest first)
       const sortedEntries = [...data].sort((a, b) => 
         new Date(b.date).getTime() - new Date(a.date).getTime()
@@ -72,15 +75,48 @@ const Timeline = () => {
   if (isLoading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
-        <div className="animate-pulse text-romance-primary">Loading timeline...</div>
+        <div className="flex flex-col items-center">
+          <Heart className="animate-heart-beat text-romance-primary h-12 w-12 mb-4" />
+          <div className="animate-pulse text-romance-primary text-lg">Loading your journey...</div>
+        </div>
       </div>
     );
   }
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.2
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
+
+  const getTimelineColor = (index: number) => {
+    const colors = [
+      'from-pink-500 to-romance-accent',
+      'from-rose-400 to-pink-300',
+      'from-fuchsia-500 to-pink-400',
+      'from-romance-primary to-rose-300',
+      'from-pink-300 to-romance-accent'
+    ];
+    return colors[index % colors.length];
+  };
+
   return (
-    <div className="py-12">
+    <div className="py-12 min-h-[50vh]">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-12">
+        <motion.div 
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="flex justify-between items-center mb-12"
+        >
           <h2 className="text-3xl md:text-4xl text-romance-primary font-bold cursive">Our Journey Together</h2>
           
           {isLoggedIn && (
@@ -98,28 +134,40 @@ const Timeline = () => {
               </DialogContent>
             </Dialog>
           )}
-        </div>
+        </motion.div>
 
         {entries.length === 0 ? (
-          <div className="text-center py-16">
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-center py-16"
+          >
             <p className="text-lg text-gray-500">No memories added yet.</p>
             {isLoggedIn && (
               <p className="mt-2 text-romance-primary">Click "Add Memory" to create your first entry!</p>
             )}
-          </div>
+          </motion.div>
         ) : (
-          <div className="relative timeline-container">
+          <motion.div 
+            className="relative timeline-container"
+            variants={container}
+            initial="hidden"
+            animate="show"
+          >
             {entries.map((entry, index) => (
-              <div 
+              <motion.div 
                 key={entry.id} 
-                className={`timeline-item mb-12 animate-fade-in`}
-                style={{ animationDelay: `${index * 0.1}s` }}
+                className="timeline-item mb-16 relative"
+                variants={item}
               >
-                <div className="timeline-dot"></div>
-                <div className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow relative">
+                <div className={`absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b ${getTimelineColor(index)}`}></div>
+                
+                <div className="absolute left-[-10px] top-0 w-5 h-5 rounded-full bg-romance-primary border-4 border-white shadow-sm"></div>
+                
+                <div className="ml-8 bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow relative">
                   {entry.is_monthsary && (
                     <div className="absolute -top-3 -right-3 bg-romance-primary text-white rounded-full p-2">
-                      <Calendar size={18} />
+                      <Heart className="h-4 w-4 fill-white" />
                     </div>
                   )}
                   
@@ -179,12 +227,14 @@ const Timeline = () => {
                   <p className="text-gray-700 mb-4 whitespace-pre-line">{entry.description}</p>
                   
                   {entry.images && entry.images.length > 0 && (
-                    <ImageGallery images={entry.images} />
+                    <div className="mt-4">
+                      <ImageGallery images={entry.images} />
+                    </div>
                   )}
                 </div>
-              </div>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
       </div>
     </div>
