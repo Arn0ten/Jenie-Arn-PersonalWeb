@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Heart } from 'lucide-react';
 
 const Navbar = () => {
   const { isLoggedIn, userName, logout } = useAuth();
@@ -19,12 +19,13 @@ const Navbar = () => {
       <div className="container mx-auto">
         <div className="flex items-center justify-between">
           <Link to="/" className="flex items-center space-x-2">
-            <h1 className="text-romance-primary text-2xl font-bold cursive">Jenie & Arn</h1>
+            <Heart className="text-pink-500 fill-pink-500 h-6 w-6" />
+            <h1 className="text-pink-500 text-2xl font-bold cursive">Jenie & Arn</h1>
           </Link>
 
           {/* Mobile menu button */}
           <button 
-            className="md:hidden text-romance-primary"
+            className="md:hidden text-pink-500"
             onClick={toggleMenu}
           >
             {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -36,8 +37,8 @@ const Navbar = () => {
               to="/" 
               className={`text-sm font-medium transition-colors ${
                 location.pathname === '/' 
-                  ? 'text-romance-primary' 
-                  : 'text-gray-600 hover:text-romance-primary'
+                  ? 'text-pink-500' 
+                  : 'text-gray-600 hover:text-pink-500'
               }`}
             >
               Home
@@ -46,8 +47,8 @@ const Navbar = () => {
               to="/timeline" 
               className={`text-sm font-medium transition-colors ${
                 location.pathname === '/timeline' 
-                  ? 'text-romance-primary' 
-                  : 'text-gray-600 hover:text-romance-primary'
+                  ? 'text-pink-500' 
+                  : 'text-gray-600 hover:text-pink-500'
               }`}
             >
               Timeline
@@ -56,8 +57,8 @@ const Navbar = () => {
               to="/gallery" 
               className={`text-sm font-medium transition-colors ${
                 location.pathname === '/gallery' 
-                  ? 'text-romance-primary' 
-                  : 'text-gray-600 hover:text-romance-primary'
+                  ? 'text-pink-500' 
+                  : 'text-gray-600 hover:text-pink-500'
               }`}
             >
               Gallery
@@ -66,8 +67,8 @@ const Navbar = () => {
               to="/about" 
               className={`text-sm font-medium transition-colors ${
                 location.pathname === '/about' 
-                  ? 'text-romance-primary' 
-                  : 'text-gray-600 hover:text-romance-primary'
+                  ? 'text-pink-500' 
+                  : 'text-gray-600 hover:text-pink-500'
               }`}
             >
               About
@@ -75,12 +76,12 @@ const Navbar = () => {
 
             {isLoggedIn ? (
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-romance-secondary">Hi, {userName}</span>
+                <span className="text-sm text-pink-500">Hi, {userName}</span>
                 <Button 
                   variant="outline" 
                   size="sm" 
                   onClick={logout}
-                  className="border-romance-primary text-romance-primary hover:bg-romance-primary hover:text-white"
+                  className="border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white"
                 >
                   Logout
                 </Button>
@@ -90,7 +91,7 @@ const Navbar = () => {
                 <Button 
                   variant="outline" 
                   size="sm"
-                  className="border-romance-primary text-romance-primary hover:bg-romance-primary hover:text-white"
+                  className="border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white"
                 >
                   Login
                 </Button>
@@ -106,7 +107,7 @@ const Navbar = () => {
               to="/" 
               className={`block py-2 text-sm font-medium ${
                 location.pathname === '/' 
-                  ? 'text-romance-primary' 
+                  ? 'text-pink-500' 
                   : 'text-gray-600'
               }`}
               onClick={() => setIsMenuOpen(false)}
@@ -117,7 +118,7 @@ const Navbar = () => {
               to="/timeline" 
               className={`block py-2 text-sm font-medium ${
                 location.pathname === '/timeline' 
-                  ? 'text-romance-primary' 
+                  ? 'text-pink-500' 
                   : 'text-gray-600'
               }`}
               onClick={() => setIsMenuOpen(false)}
@@ -128,7 +129,7 @@ const Navbar = () => {
               to="/gallery" 
               className={`block py-2 text-sm font-medium ${
                 location.pathname === '/gallery' 
-                  ? 'text-romance-primary' 
+                  ? 'text-pink-500' 
                   : 'text-gray-600'
               }`}
               onClick={() => setIsMenuOpen(false)}
@@ -139,7 +140,7 @@ const Navbar = () => {
               to="/about" 
               className={`block py-2 text-sm font-medium ${
                 location.pathname === '/about' 
-                  ? 'text-romance-primary' 
+                  ? 'text-pink-500' 
                   : 'text-gray-600'
               }`}
               onClick={() => setIsMenuOpen(false)}
@@ -149,7 +150,7 @@ const Navbar = () => {
 
             {isLoggedIn ? (
               <div className="pt-2 border-t border-gray-100">
-                <span className="block text-sm text-romance-secondary mb-2">Hi, {userName}</span>
+                <span className="block text-sm text-pink-500 mb-2">Hi, {userName}</span>
                 <Button 
                   variant="outline" 
                   size="sm" 
@@ -157,7 +158,7 @@ const Navbar = () => {
                     logout();
                     setIsMenuOpen(false);
                   }}
-                  className="w-full border-romance-primary text-romance-primary hover:bg-romance-primary hover:text-white"
+                  className="w-full border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white"
                 >
                   Logout
                 </Button>
@@ -168,7 +169,7 @@ const Navbar = () => {
                   <Button 
                     variant="outline" 
                     size="sm"
-                    className="w-full border-romance-primary text-romance-primary hover:bg-romance-primary hover:text-white"
+                    className="w-full border-pink-500 text-pink-500 hover:bg-pink-500 hover:text-white"
                   >
                     Login
                   </Button>

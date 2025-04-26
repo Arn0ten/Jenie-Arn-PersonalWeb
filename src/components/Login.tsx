@@ -5,7 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Heart } from 'lucide-react';
 
 const Login = () => {
   const [password, setPassword] = useState('');
@@ -39,7 +39,8 @@ const Login = () => {
     <div className="min-h-[80vh] flex items-center justify-center">
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg animate-fade-in">
         <div className="text-center mb-8">
-          <h2 className="text-3xl font-bold text-romance-primary cursive">Welcome Back</h2>
+          <Heart className="h-12 w-12 mx-auto text-pink-200 fill-pink-500 mb-4 animate-heart-beat" />
+          <h2 className="text-3xl font-bold text-pink-500 cursive">Welcome Back</h2>
           <p className="text-gray-600 mt-2">Login to manage your memories</p>
         </div>
         
@@ -52,8 +53,8 @@ const Login = () => {
                 variant={name === 'Jenie' ? 'default' : 'outline'}
                 className={
                   name === 'Jenie' 
-                    ? 'bg-romance-primary hover:bg-romance-secondary' 
-                    : 'border-romance-primary text-romance-primary hover:bg-romance-accent/20'
+                    ? 'bg-pink-500 hover:bg-pink-600' 
+                    : 'border-pink-500 text-pink-500 hover:bg-pink-100'
                 }
                 onClick={() => setName('Jenie')}
               >
@@ -64,8 +65,8 @@ const Login = () => {
                 variant={name === 'Arn' ? 'default' : 'outline'}
                 className={
                   name === 'Arn' 
-                    ? 'bg-romance-primary hover:bg-romance-secondary' 
-                    : 'border-romance-primary text-romance-primary hover:bg-romance-accent/20'
+                    ? 'bg-pink-500 hover:bg-pink-600' 
+                    : 'border-pink-500 text-pink-500 hover:bg-pink-100'
                 }
                 onClick={() => setName('Arn')}
               >
@@ -83,6 +84,7 @@ const Login = () => {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
               required
+              className="border-pink-200 focus:border-pink-500 focus:ring-pink-500"
             />
           </div>
           
@@ -94,7 +96,7 @@ const Login = () => {
           
           <Button 
             type="submit" 
-            className="w-full bg-romance-primary hover:bg-romance-secondary"
+            className="w-full bg-pink-500 hover:bg-pink-600"
             disabled={isLoading || !name}
           >
             {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

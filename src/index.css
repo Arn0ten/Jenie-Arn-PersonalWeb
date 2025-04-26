@@ -16,24 +16,24 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 262 78% 74%;
+    --primary: 330 100% 76%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 270 35% 54%;
+    --secondary: 336 80% 65%;
     --secondary-foreground: 222.2 47.4% 11.2%;
 
     --muted: 345 80% 95%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
     --accent: 346 100% 94%;
-    --accent-foreground: 262 78% 74%;
+    --accent-foreground: 330 100% 76%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 262 78% 74%;
+    --ring: 330 100% 76%;
 
     --radius: 0.5rem;
   }
@@ -45,6 +45,7 @@
   body {
     @apply bg-background text-foreground font-sans;
     font-family: 'Poppins', sans-serif;
+    background-color: #FFF5F7;
   }
 
   h1, h2, h3, h4, .cursive {
@@ -55,7 +56,7 @@
     content: '';
     position: absolute;
     width: 2px;
-    background-color: #9b87f5;
+    background-color: #F472B6;
     top: 0;
     bottom: 0;
     left: 50%;
@@ -82,7 +83,7 @@
     width: 20px;
     height: 20px;
     border-radius: 50%;
-    background-color: #9b87f5;
+    background-color: #F472B6;
     top: 15px;
     z-index: 10;
   }
@@ -118,4 +119,27 @@
       left: 21px;
     }
   }
+}
+
+/* Add heart-shaped pulsing animation */
+@keyframes heart-float {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-10px) scale(1.1);
+  }
+}
+
+.heart-float {
+  animation: heart-float 3s ease-in-out infinite;
+}
+
+/* Pink gradient backgrounds */
+.bg-pink-gradient {
+  background: linear-gradient(135deg, #FFDEE9 0%, #FF9ECD 100%);
+}
+
+.bg-romance-gradient {
+  background: linear-gradient(to right, #FFDEE9, #B5FFFC);
 }

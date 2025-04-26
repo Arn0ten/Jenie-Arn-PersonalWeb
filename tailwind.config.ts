@@ -65,13 +65,13 @@ export default {
 				},
 				// Romantic color palette
 				romance: {
-					primary: '#9b87f5',
-					secondary: '#7E69AB',
-					accent: '#FFDEE2',
+					primary: '#F472B6', // Pink
+					secondary: '#EC4899', // Darker pink
+					accent: '#FFDEE9', // Light pink
 					peach: '#FDE1D3',
 					softPurple: '#E5DEFF',
 					dark: '#1A1F2C',
-					light: '#F1F0FB',
+					light: '#FFF5F7', // Light pink background
 				}
 			},
 			borderRadius: {
@@ -119,6 +119,10 @@ export default {
 				'heart-beat': {
 					'0%, 100%': { transform: 'scale(1)' },
 					'50%': { transform: 'scale(1.1)' }
+				},
+				'heart-float': {
+					'0%, 100%': { transform: 'translateY(0)' },
+					'50%': { transform: 'translateY(-10px)' }
 				}
 			},
 			animation: {
@@ -126,7 +130,8 @@ export default {
 				'accordion-up': 'accordion-up 0.2s ease-out',
 				'fade-in': 'fade-in 0.5s ease-out',
 				'scale-up': 'scale-up 0.3s ease-out',
-				'heart-beat': 'heart-beat 1.5s infinite'
+				'heart-beat': 'heart-beat 1.5s infinite',
+				'heart-float': 'heart-float 3s ease-in-out infinite'
 			}
 		}
 	},
