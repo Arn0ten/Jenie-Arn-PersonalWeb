@@ -148,9 +148,13 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
                 dragConstraints={{ left: 0, right: 0 }}
                 onDragEnd={(e, info) => {
                   if (info.offset.x < -100) {
-                    nextImage(); // swipe left
+                    nextImage({
+                      stopPropagation: () => {},
+                    } as React.MouseEvent); // swipe left
                   } else if (info.offset.x > 100) {
-                    prevImage(); // swipe right
+                    prevImage({
+                      stopPropagation: () => {},
+                    } as React.MouseEvent); // swipe right
                   }
                 }}
                 className="relative flex items-center justify-center w-full h-full"
