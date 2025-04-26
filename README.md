@@ -1,73 +1,84 @@
-# Welcome to your Lovable project
+<h1 align="center">
+ 
+  Jenie & Arn 
+   <img src="https://github.com/user-attachments/assets/fb97f300-30d6-4b85-b590-aa6bb587dab3" alt="Heart Logo" width="50" height="50"/>
+</h1>
 
-## Project info
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/d4544232-c6eb-487a-add6-5dbcbcf8826b" alt="Welcome" width="400"/>
+</p>
 
-**URL**: https://lovable.dev/projects/5bc35b72-6985-45b0-b03b-b9f41f2599b6
+Welcome to **Jenie & Arn** — our couple's personal website!  
+Explore our love journey through an interactive **Timeline**, a beautiful **Gallery**, and a live **Monthsary Countdown**. ✨
 
-## How can I edit this code?
+🌐 Visit our website: [www.jeniearn.tech](https://www.jeniearn.tech/)
 
-There are several ways of editing your application.
+---
 
-**Use Lovable**
+## ✨ Features
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/5bc35b72-6985-45b0-b03b-b9f41f2599b6) and start prompting.
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/cf185f14-a27b-4f33-9e35-dcef383c02c9" alt="Logo Hearts" width="150"/>
+</p>
 
-Changes made via Lovable will be committed automatically to this repo.
+- 📜 **Timeline** — See our love story unfold.
+- 📷 **Gallery** — View our precious memories.
+- ⏳ **Monthsary Countdown** — Celebrate every milestone with us.
+- 🎨 **Modern, responsive design**.
 
-**Use your preferred IDE**
+---
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+## 🛠 Tech Stack
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white" alt="Next.js"/>
+  <img src="https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript"/>
+  <img src="https://img.shields.io/badge/Yarn-2C8EBB?style=for-the-badge&logo=yarn&logoColor=white" alt="Yarn"/>
+  <img src="https://img.shields.io/badge/Supabase-3ECF8E?style=for-the-badge&logo=supabase&logoColor=white" alt="Supabase"/>
+  <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel"/>
+  <img src="https://img.shields.io/badge/Canva-00C4CC?style=for-the-badge&logo=canva&logoColor=white" alt="Canva"/>
+</p>
 
-Follow these steps:
+> 🎨 *Logos, icons, and designs created with love using [Canva](https://www.canva.com/)!*
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+---
 
-# Step 3: Install the necessary dependencies.
-npm i
+## 📖 Our Story
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/751d0274-63cc-4724-8155-46b18c27e706" alt="Our Story" width="400"/>
+</p>
 
-**Edit a file directly in GitHub**
+Our love journey began with small moments and blossomed into a beautiful adventure.  
+Every smile, every promise, every memory — it's all captured here, forever. 🌸
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 🤝 Promises
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/c93fab1e-936c-4190-8f3b-9304ed6640b9" alt="Promises" width="400"/>
+</p>
 
-## What technologies are used for this project?
+Through thick and thin, through every moment of joy and challenge,  
+**Jenie & Arn** promise to grow, laugh, and love endlessly together.
 
-This project is built with:
+---
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 🔒 Forever Locked AHAHAHAHAHAAHAHAHAHAHAHAHAH
 
-## How can I deploy this project?
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/6484acda-62b8-4599-b252-455841b99c98" alt="Lock Heart" width="150"/>
+</p>
 
-Simply open [Lovable](https://lovable.dev/projects/5bc35b72-6985-45b0-b03b-b9f41f2599b6) and click on Share -> Publish.
+This website is a memory lock —  
+**for our past, present, and future memories together.** ❤️
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+<p align="center">
+  <strong>Thank you for being part of our love story.</strong>  
+  <br/>
+  <strong>— Jenie & Arn 🤍</strong>
+</p>
