@@ -1,13 +1,28 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import Navbar from '../components/Navbar';
+import HomePage from './HomePage';
+import TimelinePage from './TimelinePage';
+import GalleryPage from './GalleryPage';
+import AboutPage from './AboutPage';
+import LoginPage from './LoginPage';
+import { AuthProvider } from '../contexts/AuthContext';
 
 const Index = () => {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="text-center">
-        <h1 className="text-4xl font-bold mb-4">Welcome to Your Blank App</h1>
-        <p className="text-xl text-gray-600">Start building your amazing project here!</p>
+    <AuthProvider>
+      <div className="min-h-screen bg-romance-light">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/timeline" element={<TimelinePage />} />
+          <Route path="/gallery" element={<GalleryPage />} />
+          <Route path="/about" element={<AboutPage />} />
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
       </div>
-    </div>
+    </AuthProvider>
   );
 };
 
