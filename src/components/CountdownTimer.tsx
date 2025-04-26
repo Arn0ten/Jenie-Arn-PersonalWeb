@@ -1,6 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns';
+import Confetti from 'react-confetti';
+import { Heart } from 'lucide-react';
 
 type CountdownProps = {
   anniversaryDate: Date;
@@ -13,6 +15,7 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
     minutes: 0,
     seconds: 0
   });
+  const [isCelebrating, setIsCelebrating] = useState(false);
 
   useEffect(() => {
     const calculateNextMonthsary = () => {
@@ -43,6 +46,12 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
       const seconds = differenceInSeconds(nextMonthsary, now) % 60;
       
       setTimeLeft({ days, hours, minutes, seconds });
+
+      // Trigger celebration if countdown reaches zero
+      if (days === 0 && hours === 0 && minutes === 0 && seconds === 0) {
+        setIsCelebrating(true);
+        setTimeout(() => setIsCelebrating(false), 10000); // Stop after 10 seconds
+      }
     };
 
     // Update immediately
@@ -66,8 +75,17 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto text-center p-6 rounded-lg bg-white/70 backdrop-blur-sm shadow-lg animate-fade-in">
-      <div className="mb-6">
+    <div className="relative w-full max-w-4xl mx-auto text-center p-6 rounded-lg bg-gradient-to-br from-romance-accent via-white to-romance-accent/20 backdrop-blur-sm shadow-lg animate-fade-in">
+      {isCelebrating && (
+        <Confetti 
+          width={window.innerWidth}
+          height={window.innerHeight}
+          recycle={false}
+          numberOfPieces={500}
+          colors={['#F472B6', '#EC4899', '#FDE1D3']}
+        />
+      )}
+      <div className="mb-6 relative">
         <h2 className="text-4xl md:text-5xl font-bold text-romance-primary mb-2 cursive">
           Our Love Story
         </h2>
@@ -76,27 +94,30 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
           <span className="mx-2">•</span>
           <span className="font-semibold">{getMonthsaryCount()} months</span> of love
         </p>
+        {isCelebrating && (
+          <div className="absolute top-0 right-0 animate-pulse">
+            <Heart className="h-12 w-12 text-pink-500 fill-pink-500" />
+          </div>
+        )}
       </div>
       
       <div className="mb-8">
         <h3 className="text-xl text-romance-secondary mb-4">Next Monthsary In:</h3>
         <div className="flex justify-center space-x-4 md:space-x-8">
-          <div className="flex flex-col items-center">
-            <div className="text-3xl md:text-5xl font-bold text-romance-primary mb-1">{timeLeft.days}</div>
-            <div className="text-xs md:text-sm text-gray-600">Days</div>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="text-3xl md:text-5xl font-bold text-romance-primary mb-1">{timeLeft.hours}</div>
-            <div className="text-xs md:text-sm text-gray-600">Hours</div>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="text-3xl md:text-5xl font-bold text-romance-primary mb-1">{timeLeft.minutes}</div>
-            <div className="text-xs md:text-sm text-gray-600">Minutes</div>
-          </div>
-          <div className="flex flex-col items-center">
-            <div className="text-3xl md:text-5xl font-bold text-romance-primary mb-1">{timeLeft.seconds}</div>
-            <div className="text-xs md:text-sm text-gray-600">Seconds</div>
-          </div>
+          {Object.entries(timeLeft).map(([unit, value]) => (
+            <div key={unit} className="flex flex-col items-center">
+              <div 
+                className={`text-3xl md:text-5xl font-bold text-romance-primary mb-1 ${
+                  value === 0 ? 'animate-pulse' : ''
+                }`}
+              >
+                {value}
+              </div>
+              <div className="text-xs md:text-sm text-gray-600 capitalize">
+                {unit}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
       
