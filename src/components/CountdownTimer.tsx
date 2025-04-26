@@ -1,8 +1,12 @@
-
-import React, { useState, useEffect } from 'react';
-import { differenceInDays, differenceInHours, differenceInMinutes, differenceInSeconds } from 'date-fns';
-import Confetti from 'react-confetti';
-import { Heart } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import {
+  differenceInDays,
+  differenceInHours,
+  differenceInMinutes,
+  differenceInSeconds,
+} from "date-fns";
+import Confetti from "react-confetti";
+import { Heart } from "lucide-react";
 
 type CountdownProps = {
   anniversaryDate: Date;
@@ -13,38 +17,40 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
     days: 0,
     hours: 0,
     minutes: 0,
-    seconds: 0
+    seconds: 0,
   });
   const [isCelebrating, setIsCelebrating] = useState(false);
 
   useEffect(() => {
     const calculateNextMonthsary = () => {
       const now = new Date();
-      
+
       // Set the day to 23
       let nextMonthsary = new Date(now.getFullYear(), now.getMonth(), 23);
-      
+
       // If today is past the 23rd, move to next month
       if (now.getDate() > 23) {
         nextMonthsary = new Date(now.getFullYear(), now.getMonth() + 1, 23);
-      } else if (now.getDate() === 23 && 
-                (now.getHours() > 0 || now.getMinutes() > 0 || now.getSeconds() > 0)) {
+      } else if (
+        now.getDate() === 23 &&
+        (now.getHours() > 0 || now.getMinutes() > 0 || now.getSeconds() > 0)
+      ) {
         // If it's the 23rd but time has passed, move to next month
         nextMonthsary = new Date(now.getFullYear(), now.getMonth() + 1, 23);
       }
-      
+
       return nextMonthsary;
     };
 
     const updateCountdown = () => {
       const now = new Date();
       const nextMonthsary = calculateNextMonthsary();
-      
+
       const days = differenceInDays(nextMonthsary, now);
       const hours = differenceInHours(nextMonthsary, now) % 24;
       const minutes = differenceInMinutes(nextMonthsary, now) % 60;
       const seconds = differenceInSeconds(nextMonthsary, now) % 60;
-      
+
       setTimeLeft({ days, hours, minutes, seconds });
 
       // Trigger celebration if countdown reaches zero
@@ -56,10 +62,10 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
 
     // Update immediately
     updateCountdown();
-    
+
     // Then update every second
     const intervalId = setInterval(updateCountdown, 1000);
-    
+
     return () => clearInterval(intervalId);
   }, []);
 
@@ -69,7 +75,7 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
     const startMonth = anniversaryDate.getMonth();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
-    
+
     // Calculate months difference
     return (currentYear - startYear) * 12 + (currentMonth - startMonth);
   };
@@ -86,22 +92,24 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
   };
 
   return (
-    <div className={`relative w-full max-w-4xl mx-auto text-center p-6 rounded-lg ${getGradientClass()} backdrop-blur-sm shadow-lg animate-fade-in`}>
+    <div
+      className={`relative w-full max-w-4xl mx-auto text-center p-6 rounded-lg ${getGradientClass()} backdrop-blur-sm shadow-lg animate-fade-in`}
+    >
       {isCelebrating && (
         <>
-          <Confetti 
+          <Confetti
             width={window.innerWidth}
             height={window.innerHeight}
             recycle={true}
             numberOfPieces={500}
-            colors={['#F472B6', '#EC4899', '#FDE1D3', '#FB7185', '#FECDD3']}
+            colors={["#F472B6", "#EC4899", "#FDE1D3", "#FB7185", "#FECDD3"]}
             gravity={0.15}
           />
           <div className="absolute inset-0 overflow-hidden">
             {[...Array(12)].map((_, i) => (
-              <Heart 
+              <Heart
                 key={i}
-                className={`absolute animate-heart-float text-pink-400 fill-pink-400`} 
+                className={`absolute animate-heart-float text-pink-400 fill-pink-400`}
                 style={{
                   left: `${Math.random() * 100}%`,
                   top: `${Math.random() * 100}%`,
@@ -117,29 +125,45 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
         </>
       )}
       <div className="mb-6 relative">
-        <h2 className={`text-4xl md:text-5xl font-bold text-romance-primary mb-2 cursive ${isCelebrating ? 'animate-pulse' : ''}`}>
+        <h2
+          className={`text-4xl md:text-5xl font-bold text-romance-primary mb-2 cursive ${isCelebrating ? "animate-pulse" : ""}`}
+        >
           Our Love Story
         </h2>
         <p className="text-lg text-romance-secondary">
-          Since {anniversaryDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+          Since{" "}
+          {anniversaryDate.toLocaleDateString("en-US", {
+            month: "long",
+            day: "numeric",
+            year: "numeric",
+          })}
           <span className="mx-2">•</span>
-          <span className="font-semibold">{getMonthsaryCount()} months</span> of love
+          <span className="font-semibold">{getMonthsaryCount()} months</span> of
+          love
         </p>
-        <div className={`absolute -top-4 right-0 ${isCelebrating ? 'animate-heart-beat' : ''}`}>
+        <div
+          className={`absolute -top-4 right-0 ${isCelebrating ? "animate-heart-beat" : ""}`}
+        >
           <Heart className="h-12 w-12 text-pink-500 fill-pink-500" />
         </div>
       </div>
-      
+
       <div className="mb-8">
-        <h3 className="text-xl text-romance-secondary mb-4">Next Monthsary In:</h3>
+        <h3 className="text-xl text-romance-secondary mb-4">
+          Next Monthsary In:
+        </h3>
         <div className="flex justify-center space-x-4 md:space-x-8">
           {Object.entries(timeLeft).map(([unit, value]) => (
             <div key={unit} className="flex flex-col items-center">
-              <div 
+              <div
                 className={`text-3xl md:text-5xl font-bold mb-1 ${
-                  value === 0 ? 'text-pink-500 animate-pulse' : 'text-romance-primary'
-                } ${isCelebrating ? 'animate-bounce' : ''}`}
-                style={{ animationDelay: `${['days', 'hours', 'minutes', 'seconds'].indexOf(unit) * 0.15}s` }}
+                  value === 0
+                    ? "text-pink-500 animate-pulse"
+                    : "text-romance-primary"
+                } ${isCelebrating ? "animate-bounce" : ""}`}
+                style={{
+                  animationDelay: `${["days", "hours", "minutes", "seconds"].indexOf(unit) * 0.15}s`,
+                }}
               >
                 {value}
               </div>
@@ -150,20 +174,24 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
           ))}
         </div>
       </div>
-      
-      <div className={`text-lg italic ${isCelebrating ? 'text-pink-600' : 'text-gray-700'}`}>
-        {isCelebrating 
-          ? "Happy Monthsary! Today is our special day! ❤️" 
+
+      <div
+        className={`text-lg italic ${isCelebrating ? "text-pink-600" : "text-gray-700"}`}
+      >
+        {isCelebrating
+          ? "Happy Monthsary! Today is our special day! ❤️"
           : "Every moment with you is a treasure, every day a blessing."}
       </div>
 
       {isCelebrating && (
         <div className="mt-4 flex justify-center space-x-2">
           {[...Array(5)].map((_, i) => (
-            <span 
-              key={i} 
+            <span
+              key={i}
               className="inline-block h-2 w-2 rounded-full bg-pink-400"
-              style={{ animation: `pulse 1.5s ease-in-out ${i * 0.2}s infinite` }}
+              style={{
+                animation: `pulse 1.5s ease-in-out ${i * 0.2}s infinite`,
+              }}
             ></span>
           ))}
         </div>
