@@ -11,16 +11,22 @@ type ImageGalleryProps = {
 const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
 
   const openGallery = useCallback((index: number) => {
     setCurrentIndex(index);
     setIsOpen(true);
+    setLoading(true);
   }, []);
 
   const nextImage = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      setCurrentIndex((prev) => (prev + 1) % images.length);
+      setCurrentIndex((prev) => {
+        const next = (prev + 1) % images.length;
+        setLoading(true);
+        return next;
+      });
     },
     [images],
   );
@@ -28,10 +34,25 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
   const prevImage = useCallback(
     (e: React.MouseEvent) => {
       e.stopPropagation();
-      setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+      setCurrentIndex((prev) => {
+        const next = (prev - 1 + images.length) % images.length;
+        setLoading(true);
+        return next;
+      });
     },
     [images],
   );
+
+  // Helper for grid images
+  const [gridLoading, setGridLoading] = useState<{ [key: number]: boolean }>(
+    {},
+  );
+  const handleGridLoad = (index: number) => {
+    setGridLoading((prev) => ({ ...prev, [index]: false }));
+  };
+  const handleGridStart = (index: number) => {
+    setGridLoading((prev) => ({ ...prev, [index]: true }));
+  };
 
   const renderGalleryGrid = () => {
     if (images.length === 0) return null;
@@ -44,9 +65,12 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
           onClick={() => openGallery(0)}
         >
           <img
-            src={images[0]}
+            src={gridLoading[0] === false ? images[0] : "/load-gallery.png"}
             alt="Gallery item"
             className="w-full h-full object-cover transition-transform duration-300"
+            onLoad={() => handleGridLoad(0)}
+            onError={() => handleGridLoad(0)}
+            style={{ display: "block" }}
           />
         </motion.div>
       );
@@ -63,9 +87,12 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
               onClick={() => openGallery(index)}
             >
               <img
-                src={image}
+                src={gridLoading[index] === false ? image : "/load-gallery.png"}
                 alt={`Gallery item ${index + 1}`}
                 className="w-full h-full object-cover"
+                onLoad={() => handleGridLoad(index)}
+                onError={() => handleGridLoad(index)}
+                style={{ display: "block" }}
               />
             </motion.div>
           ))}
@@ -82,9 +109,12 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
           onClick={() => openGallery(0)}
         >
           <img
-            src={images[0]}
+            src={gridLoading[0] === false ? images[0] : "/load-gallery.png"}
             alt="Gallery featured item"
             className="w-full h-full object-cover"
+            onLoad={() => handleGridLoad(0)}
+            onError={() => handleGridLoad(0)}
+            style={{ display: "block" }}
           />
         </motion.div>
 
@@ -98,9 +128,14 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
               onClick={() => openGallery(index + 1)}
             >
               <img
-                src={image}
+                src={
+                  gridLoading[index + 1] === false ? image : "/load-gallery.png"
+                }
                 alt={`Gallery item ${index + 2}`}
                 className="w-full h-full object-cover"
+                onLoad={() => handleGridLoad(index + 1)}
+                onError={() => handleGridLoad(index + 1)}
+                style={{ display: "block" }}
               />
             </motion.div>
           ))}
@@ -126,73 +161,56 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
       {renderGalleryGrid()}
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="flex items-center justify-center bg-black/80 p-0 border-0 shadow-none">
-          <div className="relative w-full h-full max-w-5xl max-h-[calc(100vh-4rem)] flex items-center justify-center my-8">
-            {/* Close Button */}
+        <DialogContent className="max-w-5xl w-[calc(100%-2rem)] p-0 bg-transparent border-0 shadow-none">
+          <div className="relative w-full">
+            {/* Close button */}
             <Button
+              className="absolute top-4 right-4 rounded-full w-8 h-8 p-0 z-50 bg-black/40 hover:bg-black/60 text-white"
               onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 z-50 rounded-full w-10 h-10 p-0 bg-black/50 hover:bg-black/70 text-white"
             >
-              <X size={20} />
+              <X size={18} />
             </Button>
 
-            {/* Swipeable Image Area */}
-            <AnimatePresence initial={false} mode="wait">
+            {/* Image container with animation */}
+            <AnimatePresence mode="wait">
               <motion.div
                 key={currentIndex}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.9 }}
                 transition={{ duration: 0.3 }}
-                drag="x"
-                dragConstraints={{ left: 0, right: 0 }}
-                onDragEnd={(e, info) => {
-                  if (info.offset.x < -100) {
-                    nextImage({
-                      stopPropagation: () => {},
-                    } as React.MouseEvent); // swipe left
-                  } else if (info.offset.x > 100) {
-                    prevImage({
-                      stopPropagation: () => {},
-                    } as React.MouseEvent); // swipe right
-                  }
-                }}
-                className="relative flex items-center justify-center w-full h-full"
+                className="relative flex items-center justify-center min-h-[50vh] bg-black/90 rounded-lg overflow-hidden mt-4 mb-4"
               >
-                {/* Left Button */}
-                {images.length > 1 && (
-                  <Button
-                    onClick={prevImage}
-                    className="absolute left-4 z-40 rounded-full w-10 h-10 p-0 bg-black/50 hover:bg-black/70 text-white"
-                  >
-                    <ChevronLeft size={24} />
-                  </Button>
-                )}
+                <img
+                  src={loading ? "/load-gallery.png" : images[currentIndex]}
+                  alt={`Gallery image ${currentIndex + 1}`}
+                  className="max-h-[80vh] max-w-full object-contain"
+                  onLoad={() => setLoading(false)}
+                  onError={() => setLoading(false)}
+                  style={{ display: "block" }}
+                />
 
-                {/* Image without zooming */}
-                <div className="flex items-center justify-center max-w-full max-h-full p-4">
-                  <img
-                    src={images[currentIndex]}
-                    alt={`Gallery image ${currentIndex + 1}`}
-                    className="object-scale-down max-w-full max-h-[75vh] rounded-lg shadow-md"
-                  />
-                </div>
-
-                {/* Right Button */}
+                {/* Navigation arrows, only shown if more than 1 image */}
                 {images.length > 1 && (
-                  <Button
-                    onClick={nextImage}
-                    className="absolute right-4 z-40 rounded-full w-10 h-10 p-0 bg-black/50 hover:bg-black/70 text-white"
-                  >
-                    <ChevronRight size={24} />
-                  </Button>
-                )}
+                  <>
+                    <Button
+                      className="absolute left-4 rounded-full w-10 h-10 p-0 bg-black/40 hover:bg-black/60 text-white"
+                      onClick={prevImage}
+                    >
+                      <ChevronLeft size={24} />
+                    </Button>
+                    <Button
+                      className="absolute right-4 rounded-full w-10 h-10 p-0 bg-black/40 hover:bg-black/60 text-white"
+                      onClick={nextImage}
+                    >
+                      <ChevronRight size={24} />
+                    </Button>
 
-                {/* Image Counter */}
-                {images.length > 1 && (
-                  <div className="absolute bottom-4 w-full text-center text-white text-xs tracking-wide">
-                    {currentIndex + 1} / {images.length}
-                  </div>
+                    {/* Image counter */}
+                    <div className="absolute bottom-4 left-0 right-0 text-center text-white text-sm">
+                      {currentIndex + 1} / {images.length}
+                    </div>
+                  </>
                 )}
               </motion.div>
             </AnimatePresence>

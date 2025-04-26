@@ -41,7 +41,6 @@ const Timeline = () => {
       const data = await getTimelineEntries();
       console.log("Timeline entries fetched:", data);
 
-      // Sort entries by date (newest first)
       const sortedEntries = [...data].sort(
         (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
       );
@@ -88,7 +87,12 @@ const Timeline = () => {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
         <div className="flex flex-col items-center">
-          <Heart className="animate-heart-beat text-romance-primary h-12 w-12 mb-4" />
+          <img
+            src="/load-timeline.png"
+            alt="Loading"
+            className="animate-pulse mb-4"
+            style={{ width: 96, height: 96 }}
+          />
           <div className="animate-pulse text-romance-primary text-lg">
             Loading your journey...
           </div>
@@ -129,9 +133,9 @@ const Timeline = () => {
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="flex justify-between items-center mb-12"
+          className="flex justify-between items-center mb-12 flex-wrap"
         >
-          <h2 className="text-3xl md:text-4xl text-romance-primary font-bold cursive">
+          <h2 className="text-3xl md:text-4xl text-romance-primary font-bold cursive w-full sm:w-auto">
             Our Journey Together
           </h2>
 
@@ -142,7 +146,7 @@ const Timeline = () => {
                   <Plus size={16} className="mr-1" /> Add Memory
                 </Button>
               </DialogTrigger>
-              <DialogContent className="sm:max-w-[600px]">
+              <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Add New Memory</DialogTitle>
                 </DialogHeader>
@@ -194,7 +198,7 @@ const Timeline = () => {
                     </div>
                   )}
 
-                  <div className="flex justify-between items-start mb-3">
+                  <div className="flex justify-between items-start mb-3 flex-wrap">
                     <time className="text-sm text-romance-secondary font-medium flex items-center">
                       {format(new Date(entry.date), "MMMM d, yyyy")}
                       {entry.is_monthsary && (
@@ -220,7 +224,7 @@ const Timeline = () => {
                               <Edit size={14} />
                             </Button>
                           </DialogTrigger>
-                          <DialogContent className="sm:max-w-[600px]">
+                          <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
                             <DialogHeader>
                               <DialogTitle>Edit Memory</DialogTitle>
                             </DialogHeader>

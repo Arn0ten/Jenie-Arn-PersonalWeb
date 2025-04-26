@@ -17,12 +17,31 @@ const Navbar = () => {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-sm shadow-sm py-4 px-6">
       <div className="container mx-auto">
         <div className="flex items-center justify-between">
-          <Link to="/" className="flex items-center space-x-2">
-            <Heart className="text-pink-500 fill-pink-500 h-6 w-6" />
-            <h1 className="text-pink-500 text-2xl font-bold cursive">
-              Jenie & Arn
-            </h1>
-          </Link>
+          {isLoggedIn ? (
+            <div className="flex items-center space-x-2 -ml-6">
+              <img
+                src={userName === "Jenie" ? "/jenie.jpg" : "/arn.jpg"}
+                alt={userName}
+                className="h-10 w-10 rounded-full object-cover border-2 border-pink-400 mr-2"
+                style={{ marginLeft: "-1rem" }}
+              />
+              <span className="text-pink-500 text-lg font-semibold whitespace-nowrap ml-0.5">
+                Hi, <span className="font-bold">{userName}</span>
+              </span>
+            </div>
+          ) : (
+            <Link to="/" className="flex items-center space-x-2 -ml-6">
+              <img
+                src="/logo-hearts.png"
+                alt="Jenie & Arn Logo"
+                className="h-12 w-12 mr-2"
+                style={{ marginLeft: "-1rem" }}
+              />
+              <h1 className="text-pink-500 text-2xl font-bold font-cursive tracking-tight">
+                Jenie & Arn
+              </h1>
+            </Link>
+          )}
 
           {/* Mobile menu button */}
           <button className="md:hidden text-pink-500" onClick={toggleMenu}>
@@ -74,7 +93,6 @@ const Navbar = () => {
 
             {isLoggedIn ? (
               <div className="flex items-center space-x-2">
-                <span className="text-sm text-pink-500">Hi, {userName}</span>
                 <Button
                   variant="outline"
                   size="sm"
@@ -146,9 +164,9 @@ const Navbar = () => {
 
             {isLoggedIn ? (
               <div className="pt-2 border-t border-gray-100">
-                <span className="block text-sm text-pink-500 mb-2">
+                {/* <span className="block text-sm text-pink-500 mb-2">
                   Hi, {userName}
-                </span>
+                </span> */}
                 <Button
                   variant="outline"
                   size="sm"

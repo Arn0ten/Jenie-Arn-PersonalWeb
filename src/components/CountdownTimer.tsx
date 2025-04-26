@@ -141,10 +141,12 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
           <span className="font-semibold">{getMonthsaryCount()} months</span> of
           love
         </p>
-        <div
-          className={`absolute -top-4 right-0 ${isCelebrating ? "animate-heart-beat" : ""}`}
-        >
-          <Heart className="h-12 w-12 text-pink-500 fill-pink-500" />
+        <div className="absolute -top-6 right-0">
+          <img
+            src="/lock-heart.png"
+            alt="Lock Heart"
+            className={`h-16 w-16 ${isCelebrating ? "animate-heart-beat" : ""}`}
+          />
         </div>
       </div>
 

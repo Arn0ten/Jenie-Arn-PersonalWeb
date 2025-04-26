@@ -10,7 +10,7 @@ import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
 import { Checkbox } from "./ui/checkbox";
-import { Calendar as CalendarIcon, Loader2, X } from "lucide-react";
+import { Calendar as CalendarIcon, Camera, Loader2, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
 import { Calendar } from "./ui/calendar";
@@ -272,16 +272,39 @@ const TimelineForm: React.FC<TimelineFormProps> = ({
           </div>
         )}
 
-        {/* Image upload input */}
-        {images.length + previewUrls.length < 3 && (
-          <Input
-            id="images"
-            type="file"
-            onChange={handleImageChange}
-            accept="image/*"
-            multiple
-            className="mt-1"
-          />
+        {/* Modern file upload UI */}
+        {images.length + previewUrls.length < 1 && (
+          <div className="mb-6">
+            <label
+              htmlFor="gallery-upload"
+              className="flex flex-col items-center justify-center border-2 border-dashed border-romance-primary rounded-lg p-6 cursor-pointer hover:bg-romance-primary/10 transition"
+            >
+              <Camera size={32} className="mb-2 text-romance-primary" />
+              <span className="text-romance-primary font-semibold mb-1">
+                Choose files to upload
+              </span>
+              <span className="text-gray-500 text-sm mb-2">
+                PNG, JPG, JPEG, GIF up to 10MB each
+              </span>
+              <input
+                id="gallery-upload"
+                type="file"
+                multiple
+                accept="image/*"
+                className="hidden"
+                onChange={handleImageChange}
+              />
+              <Button
+                type="button"
+                className="mt-2 bg-romance-secondary hover:bg-romance-primary text-white"
+                onClick={() =>
+                  document.getElementById("gallery-upload")?.click()
+                }
+              >
+                Upload Files
+              </Button>
+            </label>
+          </div>
         )}
         <p className="text-xs text-gray-500 mt-1">
           Upload up to 3 images to capture this memory (JPEG, PNG, GIF)
