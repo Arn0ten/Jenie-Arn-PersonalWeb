@@ -1,140 +1,137 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
-import { checkAuth } from "../lib/supabase";
-import { useToast } from "@/hooks/use-toast";
+"use client";
 
-type AuthContextType = {
+import type React from "react";
+import { createContext, useState, useContext, useEffect } from "react";
+import { checkAuth } from "../lib/supabase";
+import Cookies from "js-cookie";
+
+interface AuthContextType {
   isLoggedIn: boolean;
   userName: string | null;
   login: (password: string, name: string) => Promise<boolean>;
   logout: () => void;
-};
+}
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({
+  isLoggedIn: false,
+  userName: null,
+  login: async () => false,
+  logout: () => {},
+});
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const useAuth = () => useContext(AuthContext);
+
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
   const [userName, setUserName] = useState<string | null>(null);
-  const { toast } = useToast();
+  const [lastActivity, setLastActivity] = useState<number>(Date.now());
+  const inactivityTimeout = 10 * 60 * 1000; // 10 minutes in milliseconds
 
-  // Check local storage on initial load
+  // Initialize auth state from cookies
   useEffect(() => {
-    const storedLoginStatus = localStorage.getItem("isLoggedIn");
-    const storedUserName = localStorage.getItem("userName");
+    const authStatus = Cookies.get("isLoggedIn");
+    const name = Cookies.get("userName");
 
-    if (storedLoginStatus === "true" && storedUserName) {
+    if (authStatus === "true" && name) {
       setIsLoggedIn(true);
-      setUserName(storedUserName);
-      console.log("Logged in from localStorage as:", storedUserName);
+      setUserName(name);
+      setLastActivity(Date.now());
     }
   }, []);
 
-  const login = async (password: string, name: string): Promise<boolean> => {
-    try {
-      console.log("Attempting login with:", {
-        name,
-        password: password.length + " chars",
+  // Track user activity
+  useEffect(() => {
+    const updateLastActivity = () => {
+      setLastActivity(Date.now());
+      // Update cookie expiration on activity
+      if (isLoggedIn) {
+        Cookies.set("isLoggedIn", "true", { expires: 1 }); // 1 day
+        if (userName) {
+          Cookies.set("userName", userName, { expires: 1 });
+        }
+      }
+    };
+
+    // Events to track user activity
+    const events = [
+      "mousedown",
+      "mousemove",
+      "keypress",
+      "scroll",
+      "touchstart",
+    ];
+
+    events.forEach((event) => {
+      window.addEventListener(event, updateLastActivity);
+    });
+
+    // Check for inactivity
+    const inactivityCheck = setInterval(() => {
+      if (isLoggedIn && Date.now() - lastActivity > inactivityTimeout) {
+        console.log("User inactive for too long, logging out");
+        handleLogout();
+      }
+    }, 60000); // Check every minute
+
+    // Handle tab/browser close
+    const handleBeforeUnload = () => {
+      // We don't log out on tab close, but we update the last activity timestamp
+      // This way if they come back within the inactivity period, they're still logged in
+      Cookies.set("lastActivity", Date.now().toString(), { expires: 1 });
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      events.forEach((event) => {
+        window.removeEventListener(event, updateLastActivity);
       });
+      clearInterval(inactivityCheck);
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, [isLoggedIn, userName, lastActivity, inactivityTimeout]);
+
+  const login = async (password: string, name: string) => {
+    try {
       const isValid = await checkAuth(password, name);
 
       if (isValid) {
         setIsLoggedIn(true);
         setUserName(name);
-        localStorage.setItem("isLoggedIn", "true");
-        localStorage.setItem("userName", name);
+        setLastActivity(Date.now());
 
-        let imageSrc = null;
-        if (name.toLowerCase() === "jenie") {
-          imageSrc = "jenie.jpg";
-        } else if (name.toLowerCase() === "arn") {
-          imageSrc = "arn.jpg";
-        }
+        // Set cookies with 1 day expiration
+        Cookies.set("isLoggedIn", "true", { expires: 1 });
+        Cookies.set("userName", name, { expires: 1 });
 
-        toast({
-          title: (
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "1rem",
-                width: "100%",
-              }}
-            >
-              {imageSrc && (
-                <img
-                  src={imageSrc}
-                  alt={name}
-                  style={{
-                    width: "clamp(48px, 12vw, 80px)",
-                    height: "clamp(48px, 12vw, 80px)",
-                    borderRadius: "50%",
-                    objectFit: "cover",
-                    boxShadow: "0 2px 8px rgba(0,0,0,0.10)",
-                    flexShrink: 0,
-                  }}
-                />
-              )}
-              <div style={{ flex: 1 }}>
-                <div style={{ fontWeight: 600, fontSize: "1.1rem" }}>
-                  Welcome back!
-                </div>
-                <div style={{ color: "#666", fontSize: "0.95rem" }}>
-                  Logged in as {name}
-                </div>
-              </div>
-            </div>
-          ),
-          duration: 1100,
-        });
-        console.log("Login successful for:", name);
         return true;
-      } else {
-        toast({
-          title: "Authentication failed",
-          description: "Invalid password or name",
-          variant: "destructive",
-          duration: 1100,
-        });
-        console.log("Login failed for:", name);
-        return false;
       }
+      return false;
     } catch (error) {
       console.error("Login error:", error);
-      toast({
-        title: "Login error",
-        description: "Something went wrong. Please try again.",
-        variant: "destructive",
-        duration: 1100,
-      });
       return false;
     }
   };
 
-  const logout = () => {
+  const handleLogout = () => {
     setIsLoggedIn(false);
     setUserName(null);
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("userName");
-    toast({
-      title: "Logged out",
-      description: "You have been logged out successfully",
-      duration: 1100,
-    });
-    console.log("User logged out");
+
+    // Remove cookies
+    Cookies.remove("isLoggedIn");
+    Cookies.remove("userName");
+    Cookies.remove("lastActivity");
   };
 
   return (
-    <AuthContext.Provider value={{ isLoggedIn, userName, login, logout }}>
+    <AuthContext.Provider
+      value={{ isLoggedIn, userName, login, logout: handleLogout }}
+    >
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
-  }
-  return context;
 };

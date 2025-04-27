@@ -38,6 +38,13 @@ export type User = {
   password: string;
 };
 
+export type ImageLike = {
+  id: number;
+  image_url: string;
+  ip_address: string;
+  created_at: string;
+};
+
 // Authentication functions
 export const checkAuth = async (
   password: string,
@@ -159,4 +166,122 @@ export const uploadImage = async (file: File, path: string) => {
     console.error("Upload failed:", err);
     throw err;
   }
+};
+
+// Image likes functions
+export const getImageLikes = async (imageUrl: string): Promise<number> => {
+  const { count, error } = await supabase
+    .from("image_likes")
+    .select("*", { count: "exact", head: true })
+    .eq("image_url", imageUrl);
+
+  if (error) {
+    console.error("Error fetching image likes:", error);
+    return 0;
+  }
+
+  return count || 0;
+};
+
+export const getLikedImages = async (ipAddress: string): Promise<string[]> => {
+  const { data, error } = await supabase
+    .from("image_likes")
+    .select("image_url")
+    .eq("ip_address", ipAddress);
+
+  if (error) {
+    console.error("Error fetching liked images:", error);
+    return [];
+  }
+
+  return data?.map((like) => like.image_url) || [];
+};
+
+export const toggleImageLike = async (
+  imageUrl: string,
+  ipAddress: string,
+): Promise<boolean> => {
+  // Check if the user already liked this image
+  const { data: existingLike, error: checkError } = await supabase
+    .from("image_likes")
+    .select("id")
+    .eq("image_url", imageUrl)
+    .eq("ip_address", ipAddress)
+    .single();
+
+  if (checkError && checkError.code !== "PGRST116") {
+    // PGRST116 is "no rows returned" which is expected if not liked
+    console.error("Error checking existing like:", checkError);
+    return false;
+  }
+
+  // If already liked, remove the like
+  if (existingLike) {
+    const { error: deleteError } = await supabase
+      .from("image_likes")
+      .delete()
+      .eq("id", existingLike.id);
+
+    if (deleteError) {
+      console.error("Error removing like:", deleteError);
+      return false;
+    }
+    return false; // Return false to indicate the image is now unliked
+  }
+
+  // If not liked, add a new like
+  const { error: insertError } = await supabase
+    .from("image_likes")
+    .insert([{ image_url: imageUrl, ip_address: ipAddress }]);
+
+  if (insertError) {
+    console.error("Error adding like:", insertError);
+    return false;
+  }
+
+  return true; // Return true to indicate the image is now liked
+};
+
+// Function to get visitor's IP address
+export const getVisitorIpAddress = async (): Promise<string> => {
+  try {
+    const response = await fetch("https://api.ipify.org?format=json");
+    const data = await response.json();
+    return data.ip;
+  } catch (error) {
+    console.error("Error fetching IP address:", error);
+    // Fallback to a session-based identifier if IP can't be determined
+    return `session-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+  }
+};
+
+// Function to get all image likes counts at once (more efficient)
+export const getAllImageLikesCounts = async (
+  imageUrls: string[],
+): Promise<Record<string, number>> => {
+  if (!imageUrls.length) return {};
+
+  const { data, error } = await supabase
+    .from("image_likes")
+    .select("image_url")
+    .in("image_url", imageUrls);
+
+  if (error) {
+    console.error("Error fetching all image likes:", error);
+    return {};
+  }
+
+  // Count occurrences of each image URL
+  const counts: Record<string, number> = {};
+  imageUrls.forEach((url) => (counts[url] = 0)); // Initialize all to 0
+
+  data?.forEach((like) => {
+    if (counts[like.image_url] !== undefined) {
+      counts[like.image_url]++;
+    } else {
+      counts[like.image_url] = 1;
+    }
+  });
+
+  return counts;
 };
