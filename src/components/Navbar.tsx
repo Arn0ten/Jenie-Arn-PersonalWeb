@@ -4,20 +4,13 @@ import { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { Button } from "./ui/button";
-import {
-  Menu,
-  X,
-  LogOut,
-  User,
-  Home,
-  Clock,
-  ImageIcon,
-  Info,
-  Lock,
-} from "lucide-react";
+import { FaImage } from "react-icons/fa6";
+import { MdInfo } from "react-icons/md";
+import { Menu, X, LogOut, User, Home, Lock } from "lucide-react";
 import { IoLogOut } from "react-icons/io5";
 import { FaLock } from "react-icons/fa6";
 import { motion, AnimatePresence } from "framer-motion";
+import { GoHomeFill } from "react-icons/go";
 
 const Navbar = () => {
   const { isLoggedIn, userName, logout } = useAuth();
@@ -158,7 +151,7 @@ const Navbar = () => {
                     : "text-gray-600 hover:text-pink-500"
                 }`}
               >
-                <Home size={16} />
+                <GoHomeFill size={16} />
                 <span>Home</span>
               </Link>
               <Link
@@ -169,7 +162,7 @@ const Navbar = () => {
                     : "text-gray-600 hover:text-pink-500"
                 }`}
               >
-                <Clock size={16} />
+                <MdInfo size={16} />
                 <span>Timeline</span>
               </Link>
               <Link
@@ -180,7 +173,7 @@ const Navbar = () => {
                     : "text-gray-600 hover:text-pink-500"
                 }`}
               >
-                <ImageIcon size={16} />
+                <FaImage size={16} />
                 <span>Gallery</span>
               </Link>
               <Link
@@ -191,7 +184,7 @@ const Navbar = () => {
                     : "text-gray-600 hover:text-pink-500"
                 }`}
               >
-                <Info size={16} />
+                <MdInfo size={16} />
                 <span>About</span>
               </Link>
 
@@ -275,8 +268,7 @@ const Navbar = () => {
                           }`}
                           onClick={() => setIsMenuOpen(false)}
                         >
-                          <Home size={20} />
-                          <span className="font-medium">Home</span>
+                          <GoHomeFill size={20} />
                         </Link>
 
                         <Link
@@ -288,8 +280,7 @@ const Navbar = () => {
                           }`}
                           onClick={() => setIsMenuOpen(false)}
                         >
-                          <Clock size={20} />
-                          <span className="font-medium">Timeline</span>
+                          <MdInfo size={20} />
                         </Link>
 
                         <Link
@@ -301,8 +292,7 @@ const Navbar = () => {
                           }`}
                           onClick={() => setIsMenuOpen(false)}
                         >
-                          <ImageIcon size={20} />
-                          <span className="font-medium">Gallery</span>
+                          <FaImage size={20} />
                         </Link>
 
                         <Link
@@ -314,8 +304,7 @@ const Navbar = () => {
                           }`}
                           onClick={() => setIsMenuOpen(false)}
                         >
-                          <Info size={20} />
-                          <span className="font-medium">About</span>
+                          <MdInfo size={20} />
                         </Link>
                       </div>
                     </div>
@@ -392,11 +381,10 @@ const Navbar = () => {
                 whileTap={{ scale: 0.9 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
-                <Home
+                <GoHomeFill
                   size={24}
-                  className={location.pathname === "/" ? "fill-pink-100" : ""}
+                  className={location.pathname === "/" ? "fill-pink-500" : ""}
                 />
-                <span className="text-xs mt-1">Home</span>
               </motion.div>
             </Link>
 
@@ -412,13 +400,12 @@ const Navbar = () => {
                 whileTap={{ scale: 0.9 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
-                <Clock
+                <MdInfo
                   size={24}
                   className={
-                    location.pathname === "/timeline" ? "fill-pink-100" : ""
+                    location.pathname === "/timeline" ? "fill-pink-500" : ""
                   }
                 />
-                <span className="text-xs mt-1">Timeline</span>
               </motion.div>
             </Link>
 
@@ -434,13 +421,12 @@ const Navbar = () => {
                 whileTap={{ scale: 0.9 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
-                <ImageIcon
+                <FaImage
                   size={24}
                   className={
-                    location.pathname === "/gallery" ? "fill-pink-100" : ""
+                    location.pathname === "/gallery" ? "fill-pink-500" : ""
                   }
                 />
-                <span className="text-xs mt-1">Gallery</span>
               </motion.div>
             </Link>
 
@@ -456,13 +442,12 @@ const Navbar = () => {
                 whileTap={{ scale: 0.9 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
-                <Info
+                <MdInfo
                   size={24}
                   className={
-                    location.pathname === "/about" ? "fill-pink-100" : ""
+                    location.pathname === "/about" ? "fill-pink-500" : ""
                   }
                 />
-                <span className="text-xs mt-1">About</span>
               </motion.div>
             </Link>
           </div>

@@ -176,14 +176,6 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
             onToggleLike={(e) => handleToggleLike(images[0], e)}
             position="top-right"
           />
-
-          {/* Total likes badge */}
-          {totalLikes > 0 && (
-            <div className="absolute bottom-2 right-2 bg-black/40 text-white text-xs px-2 py-1 rounded-full flex items-center">
-              <Heart size={12} className="mr-1 fill-pink-500 text-pink-500" />
-              <span>{totalLikes}</span>
-            </div>
-          )}
         </motion.div>
       );
     }
@@ -228,35 +220,30 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
               />
             </motion.div>
           ))}
-
-          {/* Total likes badge */}
-          {totalLikes > 0 && (
-            <div className="absolute bottom-2 right-2 bg-black/40 text-white text-xs px-2 py-1 rounded-full flex items-center z-10">
-              <Heart size={12} className="mr-1 fill-pink-500 text-pink-500" />
-              <span>{totalLikes}</span>
-            </div>
-          )}
         </div>
       );
     }
 
     // Instagram-like grid for 3+ images
+    // Custom layout: 1 large on the left, 2 stacked on the right, "X more" overlay on the last if more than 3 images
     return (
-      <div className="grid grid-cols-3 gap-1 md:gap-2 relative">
-        {/* First large image */}
+      <div className="grid grid-cols-3 gap-1 md:gap-2 relative h-60 md:h-80">
+        {/* Large image on the left */}
         <motion.div
-          className="col-span-3 h-60 md:h-80 overflow-hidden rounded-lg cursor-pointer relative group mb-1 md:mb-2"
+          className="col-span-2 row-span-2 h-full overflow-hidden rounded-lg cursor-pointer relative group flex"
           whileHover={{ scale: 1.01 }}
           onClick={() => openGallery(0)}
         >
-          <img
-            src={gridLoading[0] === false ? images[0] : "/load-gallery.png"}
-            alt="Gallery featured item"
-            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-            onLoad={() => handleGridLoad(0)}
-            onError={() => handleGridLoad(0)}
-            style={{ display: "block" }}
-          />
+          <div className="w-full h-full flex">
+            <img
+              src={gridLoading[0] === false ? images[0] : "/load-gallery.png"}
+              alt="Gallery featured item"
+              className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+              onLoad={() => handleGridLoad(0)}
+              onError={() => handleGridLoad(0)}
+              style={{ display: "block", aspectRatio: "2/3" }}
+            />
+          </div>
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-between p-4">
             <motion.div
               initial={{ opacity: 0, y: 10 }}
@@ -277,52 +264,51 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
           />
         </motion.div>
 
-        {/* Grid of smaller images */}
-        {images.slice(1, Math.min(images.length, 7)).map((image, index) => (
-          <motion.div
-            key={index + 1}
-            className="aspect-square overflow-hidden rounded-lg cursor-pointer relative group"
-            whileHover={{ scale: 1.05 }}
-            onClick={() => openGallery(index + 1)}
-          >
-            <img
-              src={
-                gridLoading[index + 1] === false ? image : "/load-gallery.png"
-              }
-              alt={`Gallery item ${index + 2}`}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-              onLoad={() => handleGridLoad(index + 1)}
-              onError={() => handleGridLoad(index + 1)}
-              style={{ display: "block" }}
-            />
-
-            {/* Show "more" overlay on the last visible image if there are more than 7 images */}
-            {index === 5 && images.length > 7 && (
-              <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
-                <span className="text-white text-lg font-bold">
-                  +{images.length - 7}
-                </span>
-              </div>
-            )}
-
-            <LikeButton
-              imageUrl={image}
-              isLiked={isLiked(image)}
-              likeCount={getLikeCount(image)}
-              onToggleLike={(e) => handleToggleLike(image, e)}
-              position="top-right"
-              size="small"
-            />
-          </motion.div>
-        ))}
-
-        {/* Total likes badge */}
-        {totalLikes > 0 && (
-          <div className="absolute bottom-2 right-2 bg-black/40 text-white text-xs px-2 py-1 rounded-full flex items-center z-10">
-            <Heart size={12} className="mr-1 fill-pink-500 text-pink-500" />
-            <span>{totalLikes}</span>
-          </div>
-        )}
+        {/* Two stacked images on the right */}
+        <div className="col-span-1 flex flex-col gap-1 md:gap-2 h-full">
+          {[1, 2].map((i) => {
+            if (!images[i]) return null;
+            const isLast = i === 2;
+            return (
+              <motion.div
+                key={i}
+                className="flex-1 overflow-hidden rounded-lg cursor-pointer relative group flex"
+                whileHover={{ scale: 1.05 }}
+                onClick={() => openGallery(i)}
+                style={{ minHeight: 0 }}
+              >
+                <div className="w-full h-full flex">
+                  <img
+                    src={
+                      gridLoading[i] === false ? images[i] : "/load-gallery.png"
+                    }
+                    alt={`Gallery item ${i + 1}`}
+                    className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-110"
+                    onLoad={() => handleGridLoad(i)}
+                    onError={() => handleGridLoad(i)}
+                    style={{ display: "block", aspectRatio: "1/1" }}
+                  />
+                </div>
+                {/* Show "more" overlay on the last visible image if there are more than 3 images */}
+                {isLast && images.length > 3 && (
+                  <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
+                    <span className="text-white text-lg font-bold">
+                      +{images.length - 3} more
+                    </span>
+                  </div>
+                )}
+                <LikeButton
+                  imageUrl={images[i]}
+                  isLiked={isLiked(images[i])}
+                  likeCount={getLikeCount(images[i])}
+                  onToggleLike={(e) => handleToggleLike(images[i], e)}
+                  position="top-right"
+                  size="small"
+                />
+              </motion.div>
+            );
+          })}
+        </div>
       </div>
     );
   };

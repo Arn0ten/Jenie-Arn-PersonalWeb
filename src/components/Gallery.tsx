@@ -25,11 +25,13 @@ import {
   ChevronLeft,
   ChevronRight,
   ImageIcon,
+  Heart,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import ImageGallery from "./ImageGallery";
 import { motion } from "framer-motion";
 import ConfirmDialog from "./ConfirmDialog";
+import { useLikes } from "../contexts/LikesContext";
 
 const Gallery = () => {
   const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
@@ -42,6 +44,7 @@ const Gallery = () => {
   const monthRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
   const { isLoggedIn, userName } = useAuth();
   const { toast } = useToast();
+  const { refreshLikesForImages, getLikeCount } = useLikes();
 
   // Refs for scroll animations
   const galleryRef = useRef<HTMLDivElement>(null);
@@ -68,6 +71,11 @@ const Gallery = () => {
       if (sortedItems.length > 0) {
         const firstDate = new Date(sortedItems[0].monthsary_date);
         setActiveMonthYear(format(firstDate, "MMMM yyyy"));
+      }
+      // Collect all image URLs to fetch like counts
+      const allImageUrls = sortedItems.flatMap((entry) => entry.images || []);
+      if (allImageUrls.length > 0) {
+        refreshLikesForImages(allImageUrls);
       }
     } catch (error) {
       console.error("Error fetching gallery items:", error);
@@ -152,7 +160,14 @@ const Gallery = () => {
       scrollToMonth(monthYears[currentIndex + 1]);
     }
   };
-
+  // Calculate total likes for a timeline entry
+  const getEntryTotalLikes = (entry: GalleryItem) => {
+    if (!entry.images || entry.images.length === 0) return 0;
+    return entry.images.reduce(
+      (total, imageUrl) => total + getLikeCount(imageUrl),
+      0,
+    );
+  };
   if (isLoading) {
     return (
       <div className="min-h-[50vh] flex items-center justify-center">
@@ -337,101 +352,119 @@ const Gallery = () => {
                     animate={{ opacity: 1 }}
                     transition={{ staggerChildren: 0.1 }}
                   >
-                    {items.map((item, index) => (
-                      <motion.div
-                        key={item.id}
-                        className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1"
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        transition={{
-                          type: "spring",
-                          stiffness: 100,
-                          damping: 10,
-                          delay: index * 0.05,
-                        }}
-                      >
-                        <div className="p-5">
-                          <div className="flex justify-between items-start mb-3">
-                            <time className="text-sm text-romance-secondary font-medium flex items-center bg-pink-50 px-2 py-1 rounded-full">
-                              <Calendar size={14} className="mr-1" />
-                              {format(
-                                new Date(item.monthsary_date),
-                                "MMMM d, yyyy",
-                              )}
-                              <span className="ml-2 opacity-60 bg-white px-1.5 py-0.5 rounded-full text-xs">
-                                {index + 1}/{items.length}
-                              </span>
-                            </time>
-
-                            {isLoggedIn && (
-                              <div className="flex space-x-2">
-                                <Dialog>
-                                  <DialogTrigger asChild>
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="h-8 w-8 p-0 hover:bg-pink-50 hover:text-pink-500 transition-colors rounded-full"
-                                      onClick={() => {
-                                        setSelectedItem(item);
-                                        setIsEditing(true);
-                                      }}
-                                    >
-                                      <Edit
-                                        size={14}
-                                        className="text-pink-400 hover:text-pink-600"
-                                      />
-                                    </Button>
-                                  </DialogTrigger>
-                                  <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
-                                    <DialogHeader>
-                                      <DialogTitle>Edit Gallery</DialogTitle>
-                                    </DialogHeader>
-                                    {selectedItem && isEditing && (
-                                      <GalleryForm
-                                        item={selectedItem}
-                                        onSuccess={handleEditSuccess}
-                                        userName={userName || ""}
-                                      />
-                                    )}
-                                  </DialogContent>
-                                </Dialog>
-
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-500 transition-colors rounded-full"
-                                  onClick={() => confirmDelete(item.id)}
+                    {items.map((item, index) => {
+                      const totalLikes = getEntryTotalLikes(item);
+                      return (
+                        <motion.div
+                          key={item.id}
+                          className="bg-white rounded-lg shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden transform hover:-translate-y-1"
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{
+                            type: "spring",
+                            stiffness: 100,
+                            damping: 10,
+                            delay: index * 0.05,
+                          }}
+                        >
+                          <div className="p-5">
+                            <div className="flex justify-between items-start mb-3">
+                              <time className="text-sm text-romance-secondary font-medium flex items-center bg-pink-50 px-2 py-1 rounded-full">
+                                <Calendar size={14} className="mr-1" />
+                                {format(
+                                  new Date(item.monthsary_date),
+                                  "MMMM d, yyyy",
+                                )}
+                                <span className="ml-2 opacity-60 bg-white px-1.5 py-0.5 rounded-full text-xs">
+                                  {index + 1}/{items.length}
+                                </span>
+                              </time>
+                              {/* Total likes badge */}
+                              {totalLikes > 0 && (
+                                <motion.div
+                                  className="flex items-center bg-pink-50 text-pink-500 px-2 py-0.5 rounded-full text-xs"
+                                  initial={{ scale: 0.9 }}
+                                  animate={{ scale: 1 }}
+                                  whileHover={{ scale: 1.1 }}
                                 >
-                                  <Trash2
-                                    size={14}
-                                    className="text-red-400 hover:text-red-600"
+                                  <Heart
+                                    size={12}
+                                    className="mr-1 fill-pink-500"
                                   />
-                                </Button>
-                              </div>
-                            )}
+                                  <span>{totalLikes}</span>
+                                </motion.div>
+                              )}
+
+                              {isLoggedIn && (
+                                <div className="flex space-x-2">
+                                  <Dialog>
+                                    <DialogTrigger asChild>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="h-8 w-8 p-0 hover:bg-pink-50 hover:text-pink-500 transition-colors rounded-full"
+                                        onClick={() => {
+                                          setSelectedItem(item);
+                                          setIsEditing(true);
+                                        }}
+                                      >
+                                        <Edit
+                                          size={14}
+                                          className="text-pink-400 hover:text-pink-600"
+                                        />
+                                      </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+                                      <DialogHeader>
+                                        <DialogTitle>Edit Gallery</DialogTitle>
+                                      </DialogHeader>
+                                      {selectedItem && isEditing && (
+                                        <GalleryForm
+                                          item={selectedItem}
+                                          onSuccess={handleEditSuccess}
+                                          userName={userName || ""}
+                                        />
+                                      )}
+                                    </DialogContent>
+                                  </Dialog>
+
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-500 transition-colors rounded-full"
+                                    onClick={() => confirmDelete(item.id)}
+                                  >
+                                    <Trash2
+                                      size={14}
+                                      className="text-red-400 hover:text-red-600"
+                                    />
+                                  </Button>
+                                </div>
+                              )}
+                            </div>
+
+                            <motion.h4
+                              className="text-xl font-bold text-romance-primary mb-3"
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ delay: 0.2 }}
+                              whileHover={{ scale: 1.01 }}
+                            >
+                              {item.title}
+                            </motion.h4>
+                            <p className="text-gray-700 mb-4 line-clamp-2">
+                              {item.description}
+                            </p>
                           </div>
 
-                          <motion.h4
-                            className="text-xl font-bold text-romance-primary mb-3"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.2 }}
-                            whileHover={{ scale: 1.01 }}
-                          >
-                            {item.title}
-                          </motion.h4>
-                          <p className="text-gray-700 mb-4 line-clamp-2">
-                            {item.description}
-                          </p>
-                        </div>
-
-                        {item.images && item.images.length > 0 && (
-                          <div className="mb-3 px-2">
-                            <ImageGallery images={item.images} />
-                          </div>
-                        )}
-                      </motion.div>
-                    ))}
+                          {item.images && item.images.length > 0 && (
+                            <div className="mb-3 px-2">
+                              <ImageGallery images={item.images} />
+                            </div>
+                          )}
+                        </motion.div>
+                      );
+                    })}
                   </motion.div>
                 </motion.div>
               ),

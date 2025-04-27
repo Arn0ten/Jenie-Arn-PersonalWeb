@@ -234,7 +234,7 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
           </div>
         </>
       )}
-      <div className="mb-6 relative flex flex-col md:block">
+      <div className="mb-6 relative">
         <motion.h2
           className={`text-4xl md:text-5xl font-bold text-romance-primary mb-2 cursive ${isCelebrating ? "animate-pulse" : ""}`}
           initial={{ opacity: 0, y: -20 }}
@@ -400,9 +400,7 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
                     repeat: Number.POSITIVE_INFINITY,
                     ease: "linear",
                   }}
-                >
-                  <RefreshCw size={24} className="text-pink-400" />
-                </motion.div>
+                ></motion.div>
               </div>
             ) : (
               <>
@@ -414,16 +412,21 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
             )}
           </motion.div>
         </AnimatePresence>
-
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={getRandomQuote}
-          disabled={isLoadingQuote}
-          className="mt-2 text-pink-500 hover:text-pink-600 hover:bg-pink-50"
-        >
-          <RefreshCw size={14} className="mr-1" /> New Quote
-        </Button>
+        {/* Auto-generate random quote every 5 seconds */}
+        {(() => {
+          // Use a ref to avoid multiple intervals
+          const quoteIntervalRef = useRef<NodeJS.Timeout | null>(null);
+          useEffect(() => {
+            quoteIntervalRef.current = setInterval(() => {
+              getRandomQuote();
+            }, 5000);
+            return () => {
+              if (quoteIntervalRef.current)
+                clearInterval(quoteIntervalRef.current);
+            };
+          }, []);
+          return null;
+        })()}
       </motion.div>
 
       <AnimatePresence mode="wait">
@@ -435,9 +438,7 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
           transition={{ duration: 0.5 }}
           className={`text-lg italic ${isCelebrating ? "text-pink-600 font-medium" : "text-gray-700"}`}
         >
-          {isCelebrating
-            ? "Happy Monthsary! Today is our special day! ❤️"
-            : "Every moment with you is a treasure, every day a blessing."}
+          {isCelebrating ? "Happy Monthsary! Today is our special day! ❤️" : ""}
         </motion.div>
       </AnimatePresence>
 
