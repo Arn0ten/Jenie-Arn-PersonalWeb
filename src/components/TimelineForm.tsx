@@ -19,7 +19,7 @@ import {
   Loader2,
   X,
   Plus,
-  ImageIcon,
+  Image as ImageIcon,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { format } from "date-fns";
@@ -287,7 +287,7 @@ const TimelineForm: React.FC<TimelineFormProps> = ({
                     key={`existing-${index}`}
                     className="relative group flex-shrink-0 rounded-lg overflow-hidden shadow-lg aspect-square w-24 h-24 bg-black"
                   >
-                    <ImageIcon
+                    <img
                       src={imageUrl || "/placeholder.svg"}
                       alt={`Existing image ${index + 1}`}
                       className="object-cover w-full h-full transition-transform duration-200 group-hover:scale-105"
@@ -315,7 +315,7 @@ const TimelineForm: React.FC<TimelineFormProps> = ({
                     key={`preview-${index}`}
                     className="relative group flex-shrink-0 rounded-lg overflow-hidden shadow-lg aspect-square w-24 h-24 bg-black"
                   >
-                    <ImageIcon
+                    <img
                       src={url || "/placeholder.svg"}
                       alt={`Preview ${index + 1}`}
                       className="object-cover w-full h-full transition-transform duration-200 group-hover:scale-105"

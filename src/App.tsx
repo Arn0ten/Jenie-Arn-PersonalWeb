@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,18 +10,18 @@ import { LikesProvider } from "./contexts/LikesContext";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
+import { TestEmailButton } from "./components/TestEmailButton";
 
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
       retry: 2,
       refetchOnWindowFocus: false,
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      staleTime: 5 * 60 * 1000,
     },
   },
 });
 
-// Loading fallback component
 const LoadingFallback = () => (
   <div className="min-h-screen bg-romance-light flex items-center justify-center">
     <div className="flex flex-col items-center gap-2">
@@ -38,6 +39,9 @@ const App = () => (
         <Sonner />
         <LikesProvider>
           <BrowserRouter>
+            <div className="fixed bottom-4 right-4 z-50">
+              <TestEmailButton />
+            </div>
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
                 <Route path="/*" element={<Index />} />

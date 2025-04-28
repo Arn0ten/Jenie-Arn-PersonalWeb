@@ -1,2 +1,5 @@
 project_id = "blmuvicbfduadqsrarhn"
 #  <!-- AYAW TAWON NI I SQL INJECT KAY WAKAY MAKUHA DNHI HAHA! -->
+
+[functions.monthsary-reminder]
+verify_jwt = false
