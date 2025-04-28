@@ -116,22 +116,21 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
   const handleToggleLike = async (imageUrl: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const wasLiked = isLiked(imageUrl);
-    await toggleLike(imageUrl);
 
-    // Only show heart animation when liking (not unliking)
+    // Trigger animation and optimistic UI update immediately
     if (!wasLiked) {
       setShowHeartAnimation(true);
 
-      // Clear any existing timeout
       if (heartAnimationTimeoutRef.current) {
         clearTimeout(heartAnimationTimeoutRef.current);
       }
-
-      // Set timeout to hide the animation after 1 second
       heartAnimationTimeoutRef.current = setTimeout(() => {
         setShowHeartAnimation(false);
       }, 1000);
     }
+
+    // Fire and forget the async call
+    toggleLike(imageUrl);
   };
 
   // Calculate total likes for this gallery
@@ -507,14 +506,14 @@ const LikeButton: React.FC<LikeButtonProps> = ({
             </Button>
           </motion.div>
         </TooltipTrigger>
-        <TooltipContent>
+        {/* <TooltipContent>
           <p>{isLiked ? "Unlike" : "Like"} this image</p>
           {showCount && (
             <p className="text-xs">
               {likeCount} {likeCount === 1 ? "like" : "likes"}
             </p>
           )}
-        </TooltipContent>
+        </TooltipContent> */}
       </Tooltip>
     </TooltipProvider>
   );

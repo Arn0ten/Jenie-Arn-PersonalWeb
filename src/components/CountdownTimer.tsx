@@ -11,7 +11,6 @@ import {
 import Confetti from "react-confetti";
 import { Heart, Quote, RefreshCw } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Button } from "./ui/button";
 
 type CountdownProps = {
   anniversaryDate: Date;
@@ -97,6 +96,8 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
   }>(loveQuotes[0]);
   const [isLoadingQuote, setIsLoadingQuote] = useState(false);
   const confettiRef = useRef<HTMLDivElement>(null);
+  const quoteContainerRef = useRef<HTMLDivElement>(null);
+  const quoteIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // Function to get a random quote
   const getRandomQuote = () => {
@@ -169,9 +170,14 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
     // Then update every second
     const intervalId = setInterval(updateCountdown, 1000);
 
+    quoteIntervalRef.current = setInterval(() => {
+      getRandomQuote();
+    }, 5000);
+
     return () => {
       clearInterval(intervalId);
       window.removeEventListener("resize", updateWindowSize);
+      if (quoteIntervalRef.current) clearInterval(quoteIntervalRef.current);
     };
   }, []);
 
@@ -243,21 +249,21 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
         >
           Our Love Story
         </motion.h2>
-        <motion.p
-          className="text-lg text-romance-secondary"
+        <motion.div
+          className="text-lg text-romance-secondary flex flex-wrap justify-center"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.2 }}
         >
-          Since{" "}
-          <span className="font-medium">
+          <span className="mr-2">Since</span>
+          <span className="font-medium mr-2">
             {anniversaryDate.toLocaleDateString("en-US", {
               month: "long",
               day: "numeric",
               year: "numeric",
             })}
           </span>
-          <span className="mx-2">•</span>
+          <span className="mx-2 hidden sm:inline">•</span>
           <motion.span
             className="font-semibold bg-pink-100 px-2 py-0.5 rounded-full"
             whileHover={{ scale: 1.05 }}
@@ -265,21 +271,12 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
           >
             {getMonthsaryCount()} months
           </motion.span>{" "}
-          of love
-        </motion.p>
+          <span className="ml-2">of love</span>
+        </motion.div>
         {/* Desktop: show image top-right, Mobile: show image below */}
         <div className="hidden md:block">
           <motion.div
-            className="
-          absolute
-          right-0
-          top-0
-          md:right-6
-          md:-top-8
-          sm:right-2
-          sm:top-2
-          z-10
-        "
+            className="absolute right-0 top-0 md:right-6 md:-top-8 sm:right-2 sm:top-2 z-10"
             initial={{ rotate: -10, scale: 0.9 }}
             animate={{ rotate: 0, scale: 1.25 }}
             transition={{ duration: 0.6, delay: 0.4 }}
@@ -288,12 +285,7 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
             <img
               src="/lock-heart.png"
               alt="Lock Heart"
-              className={`
-            h-12 w-12
-            md:h-24 md:w-24
-            ${isCelebrating ? "animate-heart-beat" : ""}
-            block
-          `}
+              className="h-12 w-12 md:h-24 md:w-24 block"
               style={{
                 right: 1,
                 top: 0,
@@ -311,11 +303,7 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
             <img
               src="/lock-heart.png"
               alt="Lock Heart"
-              className={`
-            h-16 w-16
-            ${isCelebrating ? "animate-heart-beat" : ""}
-            block
-          `}
+              className="h-16 w-16 block"
             />
           </motion.div>
         </div>
@@ -371,12 +359,14 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
         </div>
       </motion.div>
 
-      {/* Love Quote Section */}
+      {/* Love Quote Section - Fixed height to prevent layout shifts */}
       <motion.div
         className="mt-8 mb-4 relative bg-white/50 backdrop-blur-sm p-4 rounded-lg shadow-sm"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.5 }}
+        ref={quoteContainerRef}
+        style={{ minHeight: "120px" }} // Fixed minimum height to prevent layout shifts
       >
         <div className="absolute -top-3 -left-3">
           <Quote size={24} className="text-pink-500" />
@@ -400,7 +390,9 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
                     repeat: Number.POSITIVE_INFINITY,
                     ease: "linear",
                   }}
-                ></motion.div>
+                >
+                  <RefreshCw size={24} className="text-pink-400" />
+                </motion.div>
               </div>
             ) : (
               <>
@@ -413,20 +405,7 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
           </motion.div>
         </AnimatePresence>
         {/* Auto-generate random quote every 5 seconds */}
-        {(() => {
-          // Use a ref to avoid multiple intervals
-          const quoteIntervalRef = useRef<NodeJS.Timeout | null>(null);
-          useEffect(() => {
-            quoteIntervalRef.current = setInterval(() => {
-              getRandomQuote();
-            }, 5000);
-            return () => {
-              if (quoteIntervalRef.current)
-                clearInterval(quoteIntervalRef.current);
-            };
-          }, []);
-          return null;
-        })()}
+        {/* Auto-generate random quote every 5 seconds */}
       </motion.div>
 
       <AnimatePresence mode="wait">

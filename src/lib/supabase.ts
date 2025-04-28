@@ -100,8 +100,103 @@ export const updateTimelineEntry = async (
   return { data, error };
 };
 
+// Function to extract the storage path from a public URL
+export const getStoragePathFromUrl = (url: string): string | null => {
+  try {
+    // The URL format is typically: https://[project-ref].supabase.co/storage/v1/object/public/[bucket]/[path]
+    const storageUrlPattern = /\/storage\/v1\/object\/public\/([^?]+)/;
+    const match = url.match(storageUrlPattern);
+
+    if (match && match[1]) {
+      return decodeURIComponent(match[1]);
+    }
+    return null;
+  } catch (error) {
+    console.error("Error extracting storage path:", error);
+    return null;
+  }
+};
+
+// Add this function to properly delete images from Supabase storage
+export const deleteImageFromStorageAndDatabase = async (
+  imageUrl: string,
+): Promise<boolean> => {
+  try {
+    const path = getStoragePathFromUrl(imageUrl);
+    if (!path) {
+      console.error("Could not extract storage path from URL:", imageUrl);
+      return false;
+    }
+
+    // The path includes the bucket name, so we need to split it
+    const [bucket, ...pathParts] = path.split("/");
+    const filePath = pathParts.join("/");
+
+    // Delete the file from storage
+    const { error: storageError } = await supabase.storage
+      .from(bucket)
+      .remove([filePath]);
+    if (storageError) {
+      console.error("Error deleting file from storage:", storageError);
+      return false;
+    }
+
+    // Also delete any likes associated with this image
+    const { error: likesError } = await supabase
+      .from("image_likes")
+      .delete()
+      .eq("image_url", imageUrl);
+
+    if (likesError) {
+      console.error("Error deleting image likes:", likesError);
+      // We continue even if likes deletion fails
+    }
+
+    return true;
+  } catch (error) {
+    console.error("Error in deleteImageFromStorageAndDatabase:", error);
+    return false;
+  }
+};
+
+// Update the existing function to use the new one
+export const deleteImageFromStorage = async (
+  imageUrl: string,
+): Promise<boolean> => {
+  return deleteImageFromStorageAndDatabase(imageUrl);
+};
+
+// Function to delete multiple images from storage
+export const deleteImagesFromStorage = async (
+  imageUrls: string[],
+): Promise<boolean[]> => {
+  const results = await Promise.all(
+    imageUrls.map((url) => deleteImageFromStorage(url)),
+  );
+  return results;
+};
+
 export const deleteTimelineEntry = async (id: number) => {
+  // First, get the entry to access its images
+  const { data: entry, error: fetchError } = await supabase
+    .from("timeline")
+    .select("images")
+    .eq("id", id)
+    .single();
+
+  if (fetchError || !entry) {
+    console.error("Error fetching timeline entry for deletion:", fetchError);
+    return { error: fetchError };
+  }
+
+  // Delete images from storage if they exist
+  if (entry.images && entry.images.length > 0) {
+    await deleteImagesFromStorage(entry.images);
+  }
+
+  // Then delete the entry from the database
   const { error } = await supabase.from("timeline").delete().eq("id", id);
+
   if (error) console.error("Error deleting timeline entry:", error);
   return { error };
 };
@@ -142,7 +237,26 @@ export const updateGalleryItem = async (
 };
 
 export const deleteGalleryItem = async (id: number) => {
+  // First, get the gallery item to access its images
+  const { data: item, error: fetchError } = await supabase
+    .from("gallery")
+    .select("images")
+    .eq("id", id)
+    .single();
+
+  if (fetchError || !item) {
+    console.error("Error fetching gallery item for deletion:", fetchError);
+    return { error: fetchError };
+  }
+
+  // Delete images from storage if they exist
+  if (item.images && item.images.length > 0) {
+    await deleteImagesFromStorage(item.images);
+  }
+
+  // Then delete the item from the database
   const { error } = await supabase.from("gallery").delete().eq("id", id);
+
   if (error) console.error("Error deleting gallery item:", error);
   return { error };
 };
@@ -284,4 +398,78 @@ export const getAllImageLikesCounts = async (
   });
 
   return counts;
+};
+
+// Add functions for real-time subscriptions
+export const subscribeToTimelineChanges = (
+  callback: (payload: any) => void,
+) => {
+  return supabase
+    .channel("timeline-changes")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "timeline",
+      },
+      (payload) => {
+        callback(payload);
+      },
+    )
+    .subscribe();
+};
+
+export const subscribeToGalleryChanges = (callback: (payload: any) => void) => {
+  return supabase
+    .channel("gallery-changes")
+    .on(
+      "postgres_changes",
+      {
+        event: "*",
+        schema: "public",
+        table: "gallery",
+      },
+      (payload) => {
+        callback(payload);
+      },
+    )
+    .subscribe();
+};
+
+// Add function to update image in storage when editing
+export const updateImageInStorage = async (
+  oldImageUrl: string,
+  newFile: File,
+): Promise<string> => {
+  try {
+    // First delete the old image
+    await deleteImageFromStorage(oldImageUrl);
+
+    // Extract path components from the old URL to maintain the same structure
+    const path = getStoragePathFromUrl(oldImageUrl);
+    if (!path) {
+      throw new Error("Could not extract storage path from URL");
+    }
+
+    const [bucket, ...pathParts] = path.split("/");
+    const directory = pathParts.slice(0, -1).join("/");
+
+    // Upload the new image with a timestamp to avoid name conflicts
+    const timestamp = new Date().getTime();
+    const newPath = `${directory}/${timestamp}_${newFile.name}`;
+
+    const { data, error } = await supabase.storage
+      .from(bucket)
+      .upload(newPath, newFile);
+
+    if (error) {
+      throw error;
+    }
+
+    return supabase.storage.from(bucket).getPublicUrl(newPath).data.publicUrl;
+  } catch (error) {
+    console.error("Error updating image in storage:", error);
+    throw error;
+  }
 };
