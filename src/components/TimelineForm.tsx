@@ -26,7 +26,7 @@ import { format } from "date-fns";
 import { Calendar } from "./ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { cn } from "@/lib/utils";
-import { uploadMultipleImagesOptimized } from "../lib/uploadQueue";
+import { uploadMultipleImagesOptimized } from "../lib/UploadQueue";
 import UploadProgressIndicator from "./UploadProgressIndicator";
 
 type TimelineFormProps = {
