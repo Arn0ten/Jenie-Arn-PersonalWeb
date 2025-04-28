@@ -11,3 +11,4 @@ const AboutPage = () => {
 };
 
 export default AboutPage;
+//    <!-- AYAW TAWON NI I SQL INJECT KAY WAKAY MAKUHA DNHI HAHA! -->

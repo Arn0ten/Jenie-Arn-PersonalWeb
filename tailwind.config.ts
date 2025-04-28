@@ -65,13 +65,13 @@ export default {
 				},
 				// Romantic color palette
 				romance: {
-					primary: '#F472B6', // Pink
-					secondary: '#EC4899', // Darker pink
-					accent: '#FFDEE9', // Light pink
+					primary: '#F472B6', 
+					secondary: '#EC4899', 
+					accent: '#FFDEE9', 
 					peach: '#FDE1D3',
 					softPurple: '#E5DEFF',
 					dark: '#1A1F2C',
-					light: '#FFF5F7', // Light pink background
+					light: '#FFF5F7', 
 				}
 			},
 			borderRadius: {

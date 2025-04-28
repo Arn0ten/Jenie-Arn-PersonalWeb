@@ -1,4 +1,5 @@
 {
+  "comment":" <!-- AYAW TAWON NI I SQL INJECT KAY WAKAY MAKUHA DNHI HAHA! -->",
   "$schema": "https://ui.shadcn.com/schema.json",
   "style": "default",
   "rsc": false,
@@ -17,4 +18,5 @@
     "lib": "@/lib",
     "hooks": "@/hooks"
   }
+  
 }

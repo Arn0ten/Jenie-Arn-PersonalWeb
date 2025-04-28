@@ -11,3 +11,4 @@ const GalleryPage = () => {
 };
 
 export default GalleryPage;
+//    <!-- AYAW TAWON NI I SQL INJECT KAY WAKAY MAKUHA DNHI HAHA! -->
