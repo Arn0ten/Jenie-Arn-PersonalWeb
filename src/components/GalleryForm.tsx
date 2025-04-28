@@ -194,36 +194,38 @@ const GalleryForm: React.FC<GalleryFormProps> = ({
 
       <div>
         <Label htmlFor="date">Monthsary Date</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className={cn(
-                "w-full justify-start text-left font-normal",
-                !date && "text-muted-foreground",
-              )}
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {date ? format(date, "PPP") : <span>Pick a date</span>}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto p-0">
-            <Calendar
-              mode="single"
-              selected={date}
-              onSelect={(selectedDate) => {
-                setDate(selectedDate);
-                // Close the popover by simulating an Escape key press
-                const event = new KeyboardEvent("keydown", {
-                  key: "Escape",
-                  bubbles: true,
-                });
-                document.dispatchEvent(event);
-              }}
-              initialFocus
-            />
-          </PopoverContent>
-        </Popover>
+        {/* Control popover open state with a state variable */}
+        {(() => {
+          const [open, setOpen] = useState(false);
+          // Inline component to use hook
+          return (
+            <Popover open={open} onOpenChange={setOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !date && "text-muted-foreground",
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  {date ? format(date, "PPP") : <span>Pick a date</span>}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 z-[1000]">
+                <Calendar
+                  mode="single"
+                  selected={date}
+                  onSelect={(selectedDate) => {
+                    setDate(selectedDate);
+                    setOpen(false);
+                  }}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          );
+        })()}
       </div>
 
       <div>

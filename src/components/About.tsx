@@ -27,34 +27,17 @@ const About = () => {
               How We Met
             </h3>
             <p className="text-gray-700 mb-6 leading-relaxed"></p>
-            <p className="text-gray-700 mb-6 leading-relaxed">
-              This is where we'll share the beautiful story of how we first met
-              and how our love began. Every love story is special, and ours is
-              worth celebrating every day. From our first encounter to the
-              moment we knew we were meant to be together, this journey has been
-              magical.
-            </p>
+            <p className="text-gray-700 mb-6 leading-relaxed">..</p>
 
             <h3 className="text-2xl text-pink-500 font-bold mb-4 cursive">
               Our First Date
             </h3>
-            <p className="text-gray-700 mb-6 leading-relaxed">
-              Our first date was unforgettable. We can describe all the details
-              here - where we went, what we talked about, and how we felt. Those
-              special moments that made us realize this was the beginning of
-              something beautiful.
-            </p>
+            <p className="text-gray-700 mb-6 leading-relaxed">..</p>
 
             <h3 className="text-2xl text-pink-500 font-bold mb-4 cursive">
               When We Knew
             </h3>
-            <p className="text-gray-700 leading-relaxed">
-              There's always that moment when you just know. For us, it was
-              [describe the moment]. That feeling of certainty, of finding your
-              person in this vast world. Every day since then has been a
-              blessing, and we continue to fall more in love with each passing
-              day.
-            </p>
+            <p className="text-gray-700 leading-relaxed">..</p>
           </div>
 
           <div className="bg-white rounded-lg shadow-lg p-8 animate-fade-in relative">
@@ -75,9 +58,9 @@ const About = () => {
                   Jenie's Favorites
                 </h4>
                 <ul className="list-disc list-inside space-y-2 text-gray-700">
-                  <li>Favorite food: [food]</li>
-                  <li>Favorite movie: [movie]</li>
-                  <li>Favorite song: [song]</li>
+                  <li>Favorite food: Halang na fried chicken</li>
+                  <li>Favorite movie: My Beloved Summer</li>
+                  <li>Favorite song: "Rainbow" by Gatton</li>
                   <li>Favorite memory together: [memory]</li>
                   <li>What she loves about Arn: [qualities]</li>
                 </ul>
@@ -88,11 +71,11 @@ const About = () => {
                   Arn's Favorites
                 </h4>
                 <ul className="list-disc list-inside space-y-2 text-gray-700">
-                  <li>Favorite food: [food]</li>
-                  <li>Favorite movie: [movie]</li>
-                  <li>Favorite song: [song]</li>
-                  <li>Favorite memory together: [memory]</li>
-                  <li>What he loves about Jenie: [qualities]</li>
+                  <li>Favorite food: Paksiw na bangus</li>
+                  <li>Favorite movie: Drawing Closer</li>
+                  <li>Favorite song: "Rainbow" by Gatton</li>
+                  <li>Favorite memory together: No specific; Every Sunday</li>
+                  <li>What he loves about Jenie: Kabalo na sya ana haha</li>
                 </ul>
               </div>
             </div>
@@ -115,17 +98,12 @@ const About = () => {
             <h3 className="text-2xl text-pink-500 font-bold mb-4 text-center cursive">
               Our Adventures
             </h3>
-            <p className="text-gray-700 mb-6 leading-relaxed">
-              Together, we've explored new places, tried new things, and made
-              memories that will last a lifetime. Whether it's a spontaneous
-              road trip, a cozy movie night, or simply enjoying each other's
-              company, every adventure is special with you by my side.
-            </p>
+            <p className="text-gray-700 mb-6 leading-relaxed">..</p>
             <ul className="list-disc list-inside space-y-2 text-gray-700">
-              <li>First trip together: [destination or story]</li>
-              <li>Most unforgettable adventure: [memory]</li>
-              <li>Funniest moment: [moment]</li>
-              <li>Dream destination: [place]</li>
+              <li>First trip together: </li>
+              <li>Most unforgettable adventure: </li>
+              <li>Funniest moment: </li>
+              <li>Dream destination: </li>
             </ul>
             <style>
               {`
@@ -145,16 +123,13 @@ const About = () => {
             <h3 className="text-2xl text-pink-500 font-bold mb-4 text-center cursive">
               Our Promises
             </h3>
-            <p className="text-gray-700 mb-6 leading-relaxed">
-              As we continue our journey together, here are some promises we
-              make to each other:
-            </p>
+            <p className="text-gray-700 mb-6 leading-relaxed">..</p>
             <ul className="list-disc list-inside space-y-2 text-gray-700">
-              <li>To always support and encourage each other</li>
-              <li>To communicate openly and honestly</li>
-              <li>To cherish every moment, big or small</li>
-              <li>To grow together and never stop learning about each other</li>
-              <li>To love unconditionally, every single day</li>
+              <li>..</li>
+              <li>..</li>
+              <li>..</li>
+              <li>..</li>
+              <li>..</li>
             </ul>
             <img
               src="/promises.png"
@@ -168,12 +143,7 @@ const About = () => {
             <h3 className="text-2xl text-pink-500 font-bold mb-4 text-center cursive">
               Looking Forward
             </h3>
-            <p className="text-gray-700 leading-relaxed">
-              Our story is just beginning. There are so many more memories to
-              make, dreams to chase, and milestones to celebrate. Here's to a
-              future filled with love, laughter, and endless adventures
-              together!
-            </p>
+            <p className="text-gray-700 leading-relaxed">..</p>
             <div className="mt-6 text-center">
               <Heart className="w-8 h-8 mx-auto text-pink-200 fill-pink-500 animate-heart-beat" />
             </div>

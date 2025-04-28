@@ -583,7 +583,7 @@ const Gallery = () => {
             </div>
           </motion.div>
         )} */}
-        {Object.keys(groupedItems).length === 0 ? (
+        {!isLoading && Object.keys(groupedItems).length === 0 ? (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -817,7 +817,7 @@ const Gallery = () => {
       </AnimatePresence>
 
       {/* Floating action buttons */}
-      <div className="fixed bottom-24 left-4 z-50 flex flex-col gap-2">
+      <div className="fixed bottom-20 left-4 z-50 flex flex-col gap-2">
         {isLoggedIn && (
           <Dialog>
             <DialogTrigger asChild>

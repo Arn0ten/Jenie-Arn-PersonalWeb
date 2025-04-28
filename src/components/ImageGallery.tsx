@@ -475,11 +475,12 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       <Tooltip>
         <TooltipTrigger asChild>
           <motion.div
-            className={`absolute ${positionClasses[position]} z-10`}
+            className={`absolute ${positionClasses[position]} z-0 md:z-10`} // z-0 for mobile, z-10 for md+
             initial={{ opacity: 0 }}
             whileHover={{ scale: 1.2 }}
             whileTap={{ scale: 0.9 }}
             animate={{ opacity: 1 }}
+            style={{ pointerEvents: "auto" }}
           >
             <Button
               variant="ghost"
@@ -506,14 +507,6 @@ const LikeButton: React.FC<LikeButtonProps> = ({
             </Button>
           </motion.div>
         </TooltipTrigger>
-        {/* <TooltipContent>
-          <p>{isLiked ? "Unlike" : "Like"} this image</p>
-          {showCount && (
-            <p className="text-xs">
-              {likeCount} {likeCount === 1 ? "like" : "likes"}
-            </p>
-          )}
-        </TooltipContent> */}
       </Tooltip>
     </TooltipProvider>
   );

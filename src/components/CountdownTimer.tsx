@@ -75,6 +75,106 @@ const loveQuotes = [
     text: "I love you more than yesterday, but less than tomorrow.",
     author: "Rosemonde Gérard",
   },
+  {
+    text: "Whatever our souls are made of, his and mine are the same.",
+    author: "Emily Brontë",
+  },
+  {
+    text: "You are the finest, loveliest, tenderest, and most beautiful person I have ever known—and even that is an understatement.",
+    author: "F. Scott Fitzgerald",
+  },
+  {
+    text: "I would rather spend one lifetime with you than face all the ages of this world alone.",
+    author: "J.R.R. Tolkien",
+  },
+  {
+    text: "My heart is, and always will be, yours.",
+    author: "Jane Austen",
+  },
+  {
+    text: "You are my greatest adventure.",
+    author: "The Incredibles",
+  },
+  {
+    text: "I look at you and see the rest of my life in front of my eyes.",
+    author: "Unknown",
+  },
+  {
+    text: "I wish I could turn back the clock. I’d find you sooner and love you longer.",
+    author: "Unknown",
+  },
+  {
+    text: "You are the best thing that’s ever been mine.",
+    author: "Taylor Swift",
+  },
+  {
+    text: "I never want to stop making memories with you.",
+    author: "Pierre Jeanty",
+  },
+  {
+    text: "You make me want to be a better man.",
+    author: "Melvin Udall (As Good As It Gets)",
+  },
+  {
+    text: "I love you for all that you are, all that you have been, and all you’re yet to be.",
+    author: "Unknown",
+  },
+  {
+    text: "I saw that you were perfect, and so I loved you. Then I saw that you were not perfect and I loved you even more.",
+    author: "Angelita Lim",
+  },
+  {
+    text: "You are my heart, my life, my one and only thought.",
+    author: "Arthur Conan Doyle",
+  },
+  {
+    text: "I want all of you, forever, you and me, every day.",
+    author: "Nicholas Sparks",
+  },
+  {
+    text: "I love you to the moon and back.",
+    author: "Sam McBratney",
+  },
+  {
+    text: "You are the reason I believe in love.",
+    author: "Unknown",
+  },
+  {
+    text: "I found my home and paradise with you.",
+    author: "Unknown",
+  },
+  {
+    text: "You are the poem I never knew how to write and this life is the story I have always wanted to tell.",
+    author: "Tyler Knott Gregson",
+  },
+  {
+    text: "I love you more than words can wield the matter.",
+    author: "William Shakespeare",
+  },
+  {
+    text: "You are my blue crayon, the one I never have enough of, the one I use to color my sky.",
+    author: "A.R. Asher",
+  },
+  {
+    text: "I choose you. And I’ll choose you over and over and over. Without pause, without a doubt, in a heartbeat. I’ll keep choosing you.",
+    author: "Unknown",
+  },
+  {
+    text: "You are my favorite notification.",
+    author: "Unknown",
+  },
+  {
+    text: "I love you, not only for what you are but for what I am when I am with you.",
+    author: "Roy Croft",
+  },
+  {
+    text: "You are the last thought in my mind before I drift off to sleep and the first thought when I wake up each morning.",
+    author: "Unknown",
+  },
+  {
+    text: "I love you more than I have ever found a way to say to you.",
+    author: "Ben Folds",
+  },
 ];
 
 const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
@@ -366,7 +466,7 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.5 }}
         ref={quoteContainerRef}
-        style={{ minHeight: "120px" }} // Fixed minimum height to prevent layout shifts
+        style={{ minHeight: "170px" }}
       >
         <div className="absolute -top-3 -left-3">
           <Quote size={24} className="text-pink-500" />
@@ -381,27 +481,10 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
             transition={{ duration: 0.5 }}
             className="py-2"
           >
-            {isLoadingQuote ? (
-              <div className="flex justify-center items-center h-16">
-                <motion.div
-                  animate={{ rotate: 360 }}
-                  transition={{
-                    duration: 1,
-                    repeat: Number.POSITIVE_INFINITY,
-                    ease: "linear",
-                  }}
-                >
-                  <RefreshCw size={24} className="text-pink-400" />
-                </motion.div>
-              </div>
-            ) : (
-              <>
-                <p className="text-lg italic text-gray-700 mb-2">
-                  "{currentQuote.text}"
-                </p>
-                <p className="text-sm text-gray-500">— {currentQuote.author}</p>
-              </>
-            )}
+            <p className="text-lg italic text-gray-700 mb-2">
+              "{currentQuote.text}"
+            </p>
+            <p className="text-sm text-gray-500">— {currentQuote.author}</p>
           </motion.div>
         </AnimatePresence>
         {/* Auto-generate random quote every 5 seconds */}
@@ -417,7 +500,9 @@ const CountdownTimer: React.FC<CountdownProps> = ({ anniversaryDate }) => {
           transition={{ duration: 0.5 }}
           className={`text-lg italic ${isCelebrating ? "text-pink-600 font-medium" : "text-gray-700"}`}
         >
-          {isCelebrating ? "Happy Monthsary! Today is our special day! ❤️" : ""}
+          {isCelebrating
+            ? "Happy Monthsary Planggaaaa! Today is our special day! Iloveyouuuuu💗💗"
+            : ""}
         </motion.div>
       </AnimatePresence>
 

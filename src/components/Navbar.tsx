@@ -6,7 +6,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { Button } from "./ui/button";
 import { FaImage } from "react-icons/fa6";
 import { MdInfo } from "react-icons/md";
-import { Menu, X, LogOut, User, Home, Lock } from "lucide-react";
+import { Menu, X, LogOut, User, Lock } from "lucide-react";
 import { IoLogOut } from "react-icons/io5";
 import { FaLock } from "react-icons/fa6";
 import { motion, AnimatePresence } from "framer-motion";
@@ -74,7 +74,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-[100] bg-white/80 backdrop-blur-sm shadow-sm py-4 px-6">
+      <nav className="fixed top-0 left-0 right-0 z-10 bg-white/80 backdrop-blur-sm shadow-sm py-4 px-6">
         <div className="container mx-auto">
           <div className="flex items-center justify-between w-full">
             {/* Left: Logo or Greeting */}
@@ -364,11 +364,11 @@ const Navbar = () => {
           )}
         </div>
       </nav>
-
+      // ...rest of your code...
       {/* Mobile Bottom Navigation Bar */}
       {isMobile && (
         <motion.div
-          className="fixed bottom-0 left-0 right-0 bg-white shadow-lg z-[100] pb-safe"
+          className="fixed bottom-0 left-0 right-0 bg-white shadow-lg z-10 pb-safe"
           initial={{ y: 100 }}
           animate={{ y: 0 }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
@@ -456,7 +456,6 @@ const Navbar = () => {
           </div>
         </motion.div>
       )}
-
       {/* Add padding to the bottom of the page when mobile bottom nav is active */}
       {isMobile && <div className="h-16"></div>}
     </>
