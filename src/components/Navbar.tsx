@@ -11,7 +11,7 @@ import { IoLogOut } from "react-icons/io5";
 import { FaLock } from "react-icons/fa6";
 import { motion, AnimatePresence } from "framer-motion";
 import { GoHomeFill } from "react-icons/go";
-
+import { RiGitBranchFill } from "react-icons/ri";
 const Navbar = () => {
   const { isLoggedIn, userName, logout } = useAuth();
   const location = useLocation();
@@ -283,7 +283,7 @@ const Navbar = () => {
                           }`}
                           onClick={() => setIsMenuOpen(false)}
                         >
-                          <MdInfo size={20} />
+                          <RiGitBranchFill size={20} />
                         </Link>
 
                         <Link
@@ -403,7 +403,7 @@ const Navbar = () => {
                 whileTap={{ scale: 0.9 }}
                 transition={{ type: "spring", stiffness: 400, damping: 17 }}
               >
-                <MdInfo
+                <RiGitBranchFill
                   size={24}
                   className={
                     location.pathname === "/timeline" ? "fill-pink-500" : ""
