@@ -13,7 +13,7 @@ const resendApiKey = "re_GgjrzfHo_9pRgwmsK7xRkxmiwnVjiHjG6";
 const resend = new Resend(resendApiKey);
 
 export async function sendMonthsaryReminder() {
-  const monthsaryDate = dayjs("2025-04-29 00:00:00");
+  const monthsaryDate = dayjs("2025-05-29 00:00:00");
   const now = dayjs();
   const diffInHours = monthsaryDate.diff(now, "hour");
   const diffInDays = monthsaryDate.diff(now, "day");
@@ -31,10 +31,10 @@ export async function sendMonthsaryReminder() {
       <div style="max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px #ccc;">
         <h2 style="text-align: center; color: #FF4B91;">Monthsary Reminder ❤️</h2>
         <div style="text-align: center; margin: 20px 0;">
-          <img src="https://blmuvicbfduadqsrarhn.supabase.co/storage/v1/object/public/couple-images/heart-logo.png" 
+          <img src="https://blmuvicbfduadqsrarhn.supabase.co/storage/v1/object/public/couple-images/heart-logo.png"
                alt="Heart Logo" style="max-width: 100px; margin: 0 auto;">
         </div>
-        <p style="font-size: 18px; text-align: center;">Your monthsary is coming up in 
+        <p style="font-size: 18px; text-align: center;">Your monthsary is coming up in
           <strong style="color: #FF4B91; font-size: 24px;">${diffInDays > 0 ? `${diffInDays} day(s)` : `${diffInHours} hour(s)`}!</strong>
         </p>
         <hr style="border: 1px solid #f0f0f0; margin: 20px 0;">
@@ -45,7 +45,7 @@ export async function sendMonthsaryReminder() {
           </p>
         </div>
         <div style="text-align: center; margin-top: 25px;">
-          <a href="https://jeniearn.tech" 
+          <a href="https://jeniearn.tech"
              style="background-color: #FF4B91; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; font-weight: bold;">
             Visit Our Website
           </a>
