@@ -9,7 +9,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useLikes } from "../contexts/LikesContext";
 import {
   Tooltip,
-  TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
@@ -35,7 +34,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
 
   // Track if we're in the middle of a like operation to prevent race conditions
   const likeInProgressRef = useRef<{ [key: string]: boolean }>({});
-
+  const [, forceUpdate] = useState(0);
   // Load like counts for all images when component mounts
   useEffect(() => {
     if (images.length > 0) {
@@ -117,35 +116,48 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
   };
 
   const handleToggleLike = async (imageUrl: string, e: React.MouseEvent) => {
+    // Stop event propagation and prevent default behavior
     e.stopPropagation();
+    e.preventDefault();
 
-    // Prevent multiple rapid clicks from causing race conditions
+    // Prevent double-toggle if already processing
     if (likeInProgressRef.current[imageUrl]) {
+      console.log("Like operation already in progress for:", imageUrl);
       return;
     }
 
-    // Mark this image as having a like operation in progress
+    // Lock the like action for this image
     likeInProgressRef.current[imageUrl] = true;
+    forceUpdate((n) => n + 1);
 
-    const wasLiked = isLiked(imageUrl);
+    try {
+      const wasLiked = isLiked(imageUrl);
 
-    // Trigger animation and optimistic UI update immediately
-    if (!wasLiked) {
-      setShowHeartAnimation(true);
-
-      if (heartAnimationTimeoutRef.current) {
-        clearTimeout(heartAnimationTimeoutRef.current);
+      if (!wasLiked) {
+        // Show heart animation only if we're liking
+        setShowHeartAnimation(true);
+        if (heartAnimationTimeoutRef.current) {
+          clearTimeout(heartAnimationTimeoutRef.current);
+        }
+        heartAnimationTimeoutRef.current = setTimeout(() => {
+          setShowHeartAnimation(false);
+        }, 1000);
       }
-      heartAnimationTimeoutRef.current = setTimeout(() => {
-        setShowHeartAnimation(false);
-      }, 1000);
+
+      // Use a single await for the toggle operation
+      await toggleLike(imageUrl);
+
+      // Force a small delay to ensure state is properly updated
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    } catch (error) {
+      console.error("Failed to toggle like:", error);
+    } finally {
+      // Add a delay before releasing the lock to prevent rapid re-clicks
+      setTimeout(() => {
+        likeInProgressRef.current[imageUrl] = false;
+        forceUpdate((n) => n + 1);
+      }, 500);
     }
-
-    // Fire the async call and wait for it to complete
-    await toggleLike(imageUrl);
-
-    // Clear the in-progress flag
-    likeInProgressRef.current[imageUrl] = false;
   };
 
   // Calculate total likes for this gallery
@@ -183,12 +195,14 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
               <span className="text-sm font-medium">View Image</span>
             </motion.div>
           </div>
+
           <LikeButton
             imageUrl={images[0]}
             isLiked={isLiked(images[0])}
             likeCount={getLikeCount(images[0])}
             onToggleLike={(e) => handleToggleLike(images[0], e)}
             position="top-right"
+            disabled={likeInProgressRef.current[images[0]] === true}
           />
         </motion.div>
       );
@@ -231,6 +245,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
                 likeCount={getLikeCount(image)}
                 onToggleLike={(e) => handleToggleLike(image, e)}
                 position="top-right"
+                disabled={likeInProgressRef.current[image] === true}
               />
             </motion.div>
           ))}
@@ -275,6 +290,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
             likeCount={getLikeCount(images[0])}
             onToggleLike={(e) => handleToggleLike(images[0], e)}
             position="top-right"
+            disabled={likeInProgressRef.current[images[0]] === true}
           />
         </motion.div>
 
@@ -318,6 +334,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
                   onToggleLike={(e) => handleToggleLike(images[i], e)}
                   position="top-right"
                   size="small"
+                  disabled={likeInProgressRef.current[images[i]] === true}
                 />
               </motion.div>
             );
@@ -355,7 +372,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
               )}
 
               <img
-                src={images[currentIndex]}
+                src={images[currentIndex] || "/placeholder.svg"}
                 alt={`Gallery image ${currentIndex + 1}`}
                 className="max-h-[80vh] max-w-full object-contain"
                 onLoad={() => setLoading(false)}
@@ -417,6 +434,9 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
                 position="bottom-left"
                 size="large"
                 showCount={true}
+                disabled={
+                  likeInProgressRef.current[images[currentIndex]] === true
+                }
               />
             </div>
           </div>
@@ -434,6 +454,7 @@ interface LikeButtonProps {
   position: "top-left" | "top-right" | "bottom-left" | "bottom-right";
   size?: "small" | "medium" | "large";
   showCount?: boolean;
+  disabled?: boolean;
 }
 
 const LikeButton: React.FC<LikeButtonProps> = ({
@@ -444,6 +465,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
   position,
   size = "medium",
   showCount = false,
+  disabled = false,
 }) => {
   const positionClasses = {
     "top-left": "top-2 left-2",
@@ -479,9 +501,12 @@ const LikeButton: React.FC<LikeButtonProps> = ({
             <Button
               variant="ghost"
               size="icon"
-              className={`rounded-full bg-black/20 hover:bg-black/40 ${sizeClasses[size]} flex items-center justify-center `}
+              className={`rounded-full bg-black/20 hover:bg-black/40 ${sizeClasses[size]} flex items-center justify-center ${
+                disabled ? "opacity-50 cursor-not-allowed" : ""
+              }`}
               onClick={onToggleLike}
               style={{ zIndex: 10 }}
+              disabled={disabled}
             >
               <Heart
                 size={iconSizes[size]}
