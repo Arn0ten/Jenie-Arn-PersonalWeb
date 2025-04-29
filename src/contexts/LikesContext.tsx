@@ -7,6 +7,7 @@ import {
   useContext,
   useEffect,
   useCallback,
+  useRef,
 } from "react";
 import {
   getVisitorIpAddress,
@@ -47,6 +48,9 @@ export const LikesProvider: React.FC<LikesProviderProps> = ({ children }) => {
   const [visitorIp, setVisitorIp] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Track in-progress toggle operations to prevent race conditions
+  const pendingToggles = useRef<Set<string>>(new Set());
+
   // Fetch visitor IP on mount
   useEffect(() => {
     const fetchIp = async () => {
@@ -72,10 +76,39 @@ export const LikesProvider: React.FC<LikesProviderProps> = ({ children }) => {
     async (imageUrl: string) => {
       if (!visitorIp) return;
 
+      // Prevent multiple simultaneous toggle operations for the same image
+      if (pendingToggles.current.has(imageUrl)) {
+        console.log("Toggle operation already in progress for", imageUrl);
+        return;
+      }
+
       try {
+        pendingToggles.current.add(imageUrl);
+
+        // Optimistically update UI before API call completes
+        const wasLiked = likedImages.has(imageUrl);
+        const optimisticLikeCount = likeCounts[imageUrl] || 0;
+
+        // Optimistic UI update
+        setLikedImages((prev) => {
+          const newSet = new Set(prev);
+          if (wasLiked) {
+            newSet.delete(imageUrl);
+          } else {
+            newSet.add(imageUrl);
+          }
+          return newSet;
+        });
+
+        setLikeCounts((prev) => ({
+          ...prev,
+          [imageUrl]: optimisticLikeCount + (wasLiked ? -1 : 1),
+        }));
+
+        // Make the actual API call
         const isNowLiked = await toggleImageLike(imageUrl, visitorIp);
 
-        // Update local state
+        // If the server response doesn't match our optimistic update, correct it
         setLikedImages((prev) => {
           const newSet = new Set(prev);
           if (isNowLiked) {
@@ -86,16 +119,37 @@ export const LikesProvider: React.FC<LikesProviderProps> = ({ children }) => {
           return newSet;
         });
 
-        // Update like count
+        // Update like count based on the actual server response
         setLikeCounts((prev) => ({
           ...prev,
-          [imageUrl]: (prev[imageUrl] || 0) + (isNowLiked ? 1 : -1),
+          [imageUrl]:
+            (prev[imageUrl] || 0) - (wasLiked ? 1 : 0) + (isNowLiked ? 1 : 0),
         }));
       } catch (error) {
         console.error("Error toggling like:", error);
+
+        // Revert optimistic updates on error
+        setLikedImages((prev) => {
+          const newSet = new Set(prev);
+          if (likedImages.has(imageUrl)) {
+            newSet.delete(imageUrl);
+          } else {
+            newSet.add(imageUrl);
+          }
+          return newSet;
+        });
+
+        // Also revert the count
+        const wasLiked = likedImages.has(imageUrl);
+        setLikeCounts((prev) => ({
+          ...prev,
+          [imageUrl]: prev[imageUrl] + (wasLiked ? 1 : -1),
+        }));
+      } finally {
+        pendingToggles.current.delete(imageUrl);
       }
     },
-    [visitorIp],
+    [visitorIp, likedImages, likeCounts],
   );
 
   // Function to check if an image is liked

@@ -33,6 +33,9 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
   const [showHeartAnimation, setShowHeartAnimation] = useState<boolean>(false);
   const heartAnimationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Track if we're in the middle of a like operation to prevent race conditions
+  const likeInProgressRef = useRef<{ [key: string]: boolean }>({});
+
   // Load like counts for all images when component mounts
   useEffect(() => {
     if (images.length > 0) {
@@ -115,6 +118,15 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
 
   const handleToggleLike = async (imageUrl: string, e: React.MouseEvent) => {
     e.stopPropagation();
+
+    // Prevent multiple rapid clicks from causing race conditions
+    if (likeInProgressRef.current[imageUrl]) {
+      return;
+    }
+
+    // Mark this image as having a like operation in progress
+    likeInProgressRef.current[imageUrl] = true;
+
     const wasLiked = isLiked(imageUrl);
 
     // Trigger animation and optimistic UI update immediately
@@ -129,8 +141,11 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
       }, 1000);
     }
 
-    // Fire and forget the async call
-    toggleLike(imageUrl);
+    // Fire the async call and wait for it to complete
+    await toggleLike(imageUrl);
+
+    // Clear the in-progress flag
+    likeInProgressRef.current[imageUrl] = false;
   };
 
   // Calculate total likes for this gallery
@@ -327,104 +342,83 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images }) => {
               <X size={18} />
             </Button>
 
-            {/* Image container with animation */}
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={currentIndex}
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{
-                  duration: 0.3,
-                  type: "spring",
-                  stiffness: 200,
-                  damping: 25,
+            {/* Image container - removed animation for navigation */}
+            <div className="relative flex items-center justify-center min-h-[50vh] bg-black/90 rounded-lg overflow-hidden mt-4 mb-4">
+              {loading && (
+                <div className="absolute inset-0 flex items-center justify-center  bg-black/80">
+                  <img
+                    src="/load-gallery.png"
+                    alt="Loading"
+                    className="w-16 h-16 animate-pulse"
+                  />
+                </div>
+              )}
+
+              <img
+                src={images[currentIndex]}
+                alt={`Gallery image ${currentIndex + 1}`}
+                className="max-h-[80vh] max-w-full object-contain"
+                onLoad={() => setLoading(false)}
+                onError={() => setLoading(false)}
+                style={{
+                  opacity: loading ? 0 : 1,
                 }}
-                className="relative flex items-center justify-center min-h-[50vh] bg-black/90 rounded-lg overflow-hidden mt-4 mb-4"
-              >
-                {loading && (
+              />
+
+              {/* Heart animation overlay */}
+              <AnimatePresence>
+                {showHeartAnimation && (
                   <motion.div
-                    className="absolute inset-0 flex items-center justify-center"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 flex items-center justify-center pointer-events-none "
+                    initial={{ opacity: 0, scale: 0.5 }}
+                    animate={{ opacity: 1, scale: 1.5 }}
+                    exit={{ opacity: 0, scale: 2 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
                   >
-                    <div className="w-12 h-12 border-4 border-pink-300 border-t-pink-500 rounded-full animate-spin"></div>
+                    <Heart
+                      size={120}
+                      className="text-white fill-pink-500 drop-shadow-lg"
+                    />
                   </motion.div>
                 )}
+              </AnimatePresence>
 
-                <motion.img
-                  src={images[currentIndex]}
-                  alt={`Gallery image ${currentIndex + 1}`}
-                  className="max-h-[80vh] max-w-full object-contain"
-                  onLoad={() => setLoading(false)}
-                  onError={() => setLoading(false)}
-                  style={{
-                    display: loading ? "none" : "block",
-                    opacity: loading ? 0 : 1,
-                  }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: loading ? 0 : 1 }}
-                  transition={{ duration: 0.3 }}
-                />
+              {/* Navigation arrows, only shown if more than 1 image */}
+              {images.length > 1 && (
+                <>
+                  <Button
+                    className="absolute left-4 rounded-full w-10 h-10 p-0 bg-black/40 hover:bg-black/60 text-white transform transition-transform hover:scale-110 "
+                    onClick={prevImage}
+                  >
+                    <ChevronLeft size={24} />
+                  </Button>
+                  <Button
+                    className="absolute right-4 rounded-full w-10 h-10 p-0 bg-black/40 hover:bg-black/60 text-white transform transition-transform hover:scale-110 "
+                    onClick={nextImage}
+                  >
+                    <ChevronRight size={24} />
+                  </Button>
 
-                {/* Heart animation overlay */}
-                <AnimatePresence>
-                  {showHeartAnimation && (
-                    <motion.div
-                      className="absolute inset-0 flex items-center justify-center pointer-events-none"
-                      initial={{ opacity: 0, scale: 0.5 }}
-                      animate={{ opacity: 1, scale: 1.5 }}
-                      exit={{ opacity: 0, scale: 2 }}
-                      transition={{ duration: 0.6, ease: "easeOut" }}
-                    >
-                      <Heart
-                        size={120}
-                        className="text-white fill-pink-500 drop-shadow-lg"
-                      />
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+                  {/* Image counter */}
+                  <div className="absolute bottom-4 left-0 right-0 text-center">
+                    <span className="bg-black/50 text-white text-sm px-3 py-1 rounded-full">
+                      {currentIndex + 1} / {images.length}
+                    </span>
+                  </div>
+                </>
+              )}
 
-                {/* Navigation arrows, only shown if more than 1 image */}
-                {images.length > 1 && (
-                  <>
-                    <Button
-                      className="absolute left-4 rounded-full w-10 h-10 p-0 bg-black/40 hover:bg-black/60 text-white transform transition-transform hover:scale-110"
-                      onClick={prevImage}
-                    >
-                      <ChevronLeft size={24} />
-                    </Button>
-                    <Button
-                      className="absolute right-4 rounded-full w-10 h-10 p-0 bg-black/40 hover:bg-black/60 text-white transform transition-transform hover:scale-110"
-                      onClick={nextImage}
-                    >
-                      <ChevronRight size={24} />
-                    </Button>
-
-                    {/* Image counter */}
-                    <div className="absolute bottom-4 left-0 right-0 text-center">
-                      <span className="bg-black/50 text-white text-sm px-3 py-1 rounded-full">
-                        {currentIndex + 1} / {images.length}
-                      </span>
-                    </div>
-                  </>
-                )}
-
-                {/* Like button */}
-                <LikeButton
-                  imageUrl={images[currentIndex]}
-                  isLiked={isLiked(images[currentIndex])}
-                  likeCount={getLikeCount(images[currentIndex])}
-                  onToggleLike={(e) =>
-                    handleToggleLike(images[currentIndex], e)
-                  }
-                  position="top-left"
-                  size="large"
-                  showCount={true}
-                />
-              </motion.div>
-            </AnimatePresence>
+              {/* Like button */}
+              <LikeButton
+                imageUrl={images[currentIndex]}
+                isLiked={isLiked(images[currentIndex])}
+                likeCount={getLikeCount(images[currentIndex])}
+                onToggleLike={(e) => handleToggleLike(images[currentIndex], e)}
+                position="bottom-left"
+                size="large"
+                showCount={true}
+              />
+            </div>
           </div>
         </DialogContent>
       </Dialog>
@@ -475,7 +469,7 @@ const LikeButton: React.FC<LikeButtonProps> = ({
       <Tooltip>
         <TooltipTrigger asChild>
           <motion.div
-            className={`absolute ${positionClasses[position]} z-0 md:z-10`} // z-0 for mobile, z-10 for md+
+            className={`absolute ${positionClasses[position]} `}
             initial={{ opacity: 0 }}
             whileHover={{ scale: 1.2 }}
             whileTap={{ scale: 0.9 }}
@@ -485,22 +479,16 @@ const LikeButton: React.FC<LikeButtonProps> = ({
             <Button
               variant="ghost"
               size="icon"
-              className={`rounded-full bg-black/20 hover:bg-black/40 ${sizeClasses[size]} flex items-center justify-center`}
+              className={`rounded-full bg-black/20 hover:bg-black/40 ${sizeClasses[size]} flex items-center justify-center `}
               onClick={onToggleLike}
+              style={{ zIndex: 10 }}
             >
-              <motion.div
-                animate={isLiked ? { scale: [1, 1.3, 1] } : {}}
-                transition={{ duration: 0.3 }}
-              >
-                <Heart
-                  size={iconSizes[size]}
-                  className={
-                    isLiked ? "fill-red-500 text-red-500" : "text-white"
-                  }
-                />
-              </motion.div>
+              <Heart
+                size={iconSizes[size]}
+                className={isLiked ? "fill-red-500 text-red-500" : "text-white"}
+              />
               {showCount && likeCount > 0 && (
-                <span className="absolute -bottom-2 -right-2 bg-pink-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full h-6 w-6 flex items-center justify-center font-medium">
                   {likeCount}
                 </span>
               )}

@@ -11,7 +11,16 @@ import {
 } from "./ui/dialog";
 import { Mail } from "lucide-react";
 
-export function TestEmailButton({ variant = "default", size = "default" }) {
+export function TestEmailButton({
+  variant = "default" as
+    | "default"
+    | "destructive"
+    | "outline"
+    | "secondary"
+    | "ghost"
+    | "link",
+  size = "default" as "default" | "sm" | "lg" | "icon",
+}) {
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 

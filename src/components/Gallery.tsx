@@ -693,79 +693,34 @@ const Gallery = () => {
                             delay: index * 0.05,
                           }}
                         >
-                          <div className="p-5">
-                            <div className="flex justify-between items-start mb-3">
-                              <time className="text-sm text-romance-secondary font-medium flex items-center bg-pink-50 px-2 py-1 rounded-full">
+                          <div className="p-5 relative">
+                            <div className="flex justify-between items-start mb-3 flex-wrap">
+                              <time className="text-sm text-romance-secondary font-medium flex items-center bg-pink-50 px-2 py-1 rounded-full mr-2 mb-2">
                                 <Calendar size={14} className="mr-1" />
                                 {format(
                                   new Date(item.monthsary_date),
                                   "MMMM d, yyyy",
                                 )}
-                                <span className="ml-2 opacity-60 bg-white px-1.5 py-0.5 rounded-full text-xs">
-                                  {index + 1}/{items.length}
-                                </span>
                               </time>
-                              {/* Total likes badge */}
+
+                              {/* <span className="text-xs bg-white px-1.5 py-0.5 rounded-full border border-pink-100 text-pink-400 ml-auto mr-2">
+                                {index + 1}/{items.length}
+                              </span> */}
+
+                              {/* Total likes badge - moved to top right and made more prominent */}
                               {totalLikes > 0 && (
                                 <motion.div
-                                  className="flex items-center bg-pink-50 text-pink-500 px-2 py-0.5 rounded-full text-xs"
+                                  className="flex items-center bg-pink-100 text-pink-500 px-2 py-1 rounded-full text-sm font-medium absolute top-2 right-2"
                                   initial={{ scale: 0.9 }}
                                   animate={{ scale: 1 }}
                                   whileHover={{ scale: 1.1 }}
                                 >
                                   <Heart
-                                    size={12}
+                                    size={14}
                                     className="mr-1 fill-pink-500"
                                   />
                                   <span>{totalLikes}</span>
                                 </motion.div>
-                              )}
-
-                              {isLoggedIn && (
-                                <div className="flex space-x-2">
-                                  <Dialog>
-                                    <DialogTrigger asChild>
-                                      <Button
-                                        variant="outline"
-                                        size="sm"
-                                        className="h-8 w-8 p-0 hover:bg-pink-50 hover:text-pink-500 transition-colors rounded-full"
-                                        onClick={() => {
-                                          setSelectedItem(item);
-                                          setIsEditing(true);
-                                        }}
-                                      >
-                                        <Edit
-                                          size={14}
-                                          className="text-pink-400 hover:text-pink-600"
-                                        />
-                                      </Button>
-                                    </DialogTrigger>
-                                    <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
-                                      <DialogHeader>
-                                        <DialogTitle>Edit Gallery</DialogTitle>
-                                      </DialogHeader>
-                                      {selectedItem && isEditing && (
-                                        <GalleryForm
-                                          item={selectedItem}
-                                          onSuccess={handleEditSuccess}
-                                          userName={userName || ""}
-                                        />
-                                      )}
-                                    </DialogContent>
-                                  </Dialog>
-
-                                  <Button
-                                    variant="outline"
-                                    size="sm"
-                                    className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-500 transition-colors rounded-full"
-                                    onClick={() => confirmDelete(item.id)}
-                                  >
-                                    <Trash2
-                                      size={14}
-                                      className="text-red-400 hover:text-red-600"
-                                    />
-                                  </Button>
-                                </div>
                               )}
                             </div>
 
@@ -778,9 +733,54 @@ const Gallery = () => {
                             >
                               {item.title}
                             </motion.h4>
-                            <p className="text-gray-700 mb-4 line-clamp-2">
+                            <p className="text-gray-700 mb-6 line-clamp-2">
                               {item.description}
                             </p>
+
+                            {/* Edit/Delete buttons - made larger and more visible */}
+                            {isLoggedIn && (
+                              <div className="flex space-x-2 absolute top-14 right-2">
+                                <Dialog>
+                                  <DialogTrigger asChild>
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="h-8 w-8 p-0 bg-pink-50 hover:bg-pink-100 hover:text-pink-600 border-pink-200 transition-colors rounded-full"
+                                      onClick={() => {
+                                        setSelectedItem(item);
+                                        setIsEditing(true);
+                                      }}
+                                    >
+                                      <Edit
+                                        size={16}
+                                        className="text-pink-500"
+                                      />
+                                    </Button>
+                                  </DialogTrigger>
+                                  <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+                                    <DialogHeader>
+                                      <DialogTitle>Edit Gallery</DialogTitle>
+                                    </DialogHeader>
+                                    {selectedItem && isEditing && (
+                                      <GalleryForm
+                                        item={selectedItem}
+                                        onSuccess={handleEditSuccess}
+                                        userName={userName || ""}
+                                      />
+                                    )}
+                                  </DialogContent>
+                                </Dialog>
+
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="h-8 w-8 p-0 bg-red-50 hover:bg-red-100 hover:text-red-600 border-red-200 transition-colors rounded-full"
+                                  onClick={() => confirmDelete(item.id)}
+                                >
+                                  <Trash2 size={16} className="text-red-500" />
+                                </Button>
+                              </div>
+                            )}
                           </div>
 
                           {item.images && item.images.length > 0 && (

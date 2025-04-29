@@ -840,6 +840,17 @@ const Timeline = () => {
                     }}
                     whileHover={{ scale: 1.01 }}
                   >
+                    {/* Heart badge outside the card */}
+                    {entry.is_monthsary && (
+                      <motion.div
+                        className={`absolute -top-7 ${isLeft ? "-right-7" : "-left-7"} bg-romance-primary text-white rounded-full p-3 shadow-lg z-30`}
+                        whileHover={{ scale: 1.2, rotate: 10 }}
+                        transition={{ duration: 0.2 }}
+                      >
+                        <Heart className="h-5 w-5 fill-white" />
+                      </motion.div>
+                    )}
+
                     {/* Timeline dot */}
                     <motion.div
                       className="absolute top-6 w-6 h-6 rounded-full border-4 border-white shadow-xl z-10"
@@ -867,7 +878,9 @@ const Timeline = () => {
                           className="text-romance-primary mr-1"
                         />
                         <span className="text-xs font-medium text-romance-secondary">
-                          {format(new Date(entry.date), "MMM d, yyyy")}
+                          <span className="flex flex-row items-center gap-2 whitespace-nowrap">
+                            {format(new Date(entry.date), "MMM d, yyyy (EEE)")}
+                          </span>
                         </span>
                       </div>
                     </motion.div>
@@ -888,16 +901,6 @@ const Timeline = () => {
                       ></div>
 
                       <div className="p-6">
-                        {entry.is_monthsary && (
-                          <motion.div
-                            className="absolute -top-3 -right-3 bg-romance-primary text-white rounded-full p-2 shadow-lg z-10"
-                            whileHover={{ scale: 1.2, rotate: 10 }}
-                            transition={{ duration: 0.2 }}
-                          >
-                            <Heart className="h-4 w-4 fill-white" />
-                          </motion.div>
-                        )}
-
                         <div className="flex justify-between items-start mb-4 flex-wrap">
                           <div className="flex items-center">
                             {entry.is_monthsary && (
