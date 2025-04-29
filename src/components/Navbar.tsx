@@ -12,26 +12,15 @@ import { FaLock } from "react-icons/fa6";
 import { motion, AnimatePresence } from "framer-motion";
 import { GoHomeFill } from "react-icons/go";
 import { RiGitBranchFill } from "react-icons/ri";
+import { TestEmailButton } from "./TestEmailButton";
+import { useIsMobile } from "../hooks/use-mobile";
+
 const Navbar = () => {
   const { isLoggedIn, userName, logout } = useAuth();
   const location = useLocation();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Check if mobile view
-  useEffect(() => {
-    const checkIfMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkIfMobile();
-    window.addEventListener("resize", checkIfMobile);
-
-    return () => {
-      window.removeEventListener("resize", checkIfMobile);
-    };
-  }, []);
+  const isMobile = useIsMobile();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -105,6 +94,11 @@ const Navbar = () => {
                   </h1>
                 </Link>
               )}
+            </div>
+
+            {/* Middle: Email Button (only for logged in users) */}
+            <div className="flex items-center space-x-2">
+              {isLoggedIn && <TestEmailButton variant="outline" size="sm" />}
             </div>
 
             {/* Right: Login/Logout button (mobile only) */}
@@ -364,7 +358,7 @@ const Navbar = () => {
           )}
         </div>
       </nav>
-      // ...rest of your code...
+
       {/* Mobile Bottom Navigation Bar */}
       {isMobile && (
         <motion.div
@@ -456,6 +450,7 @@ const Navbar = () => {
           </div>
         </motion.div>
       )}
+
       {/* Add padding to the bottom of the page when mobile bottom nav is active */}
       {isMobile && <div className="h-16"></div>}
     </>
