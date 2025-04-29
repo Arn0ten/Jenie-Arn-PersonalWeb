@@ -9,7 +9,7 @@ import { LikesProvider } from "./contexts/LikesContext";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
-// import { TestEmailButton } from "./components/TestEmailButton";
+import { TestEmailButton } from "./components/TestEmailButton";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -38,9 +38,9 @@ const App = () => (
         <Sonner />
         <LikesProvider>
           <BrowserRouter>
-            {/* <div className="fixed bottom-4 right-4 z-50">
+            <div className="fixed bottom-4 right-4 z-50">
               <TestEmailButton />
-            </div> */}
+            </div>
             <Suspense fallback={<LoadingFallback />}>
               <Routes>
                 <Route path="/*" element={<Index />} />
